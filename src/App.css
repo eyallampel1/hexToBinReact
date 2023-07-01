@@ -1,0 +1,24 @@
+.App {
+  display: flex;
+  flex-direction: row;
+}
+
+.byte_container {
+  display: flex;
+}
+
+.radio_container {
+  width: 200px;
+  margin: auto;
+}
+
+.radio_input {
+  display: inline-block;
+  vertical-align: center;
+  margin-right: 3%;
+}
+
+.radio_label {
+  display: inline-block;
+  vertical-align: center;
+}
