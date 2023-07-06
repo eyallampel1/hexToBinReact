@@ -1,20 +1,42 @@
 .hex2binComp {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  /* allow the items to wrap to new lines */
   align-items: stretch;
   justify-content: center;
+  padding: 0 30px;
+  /* add some padding on the sides to ensure there's some space there */
 }
+
+.forMarginName {
+  flex: 1 0 auto;
+  /* allow these items to flex to fill available space */
+  margin: 60px;
+  min-width: 100px;
+  /* specify a minimum width to ensure they don't get too small */
+}
+
 
 .byte_container {
   display: flex;
+  margin-bottom: 20px;
+
 }
 
+
 .radio_container {
+  /* //margin top  */
+
   width: 200px;
   margin: auto;
+
+  margin-top: 20px;
+  /* Add a top margin */
 }
 
 .radio_input {
+
   display: inline-block;
   vertical-align: center;
   margin-right: 3%;
@@ -27,4 +49,13 @@
 
 h1 {
   text-align: center;
+}
+
+.binIndexNumberContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+
+
 }
