@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './HexToBin.css';
 
-const HexToBin = () => {
+const HexToBin = ({ bitLabels }) => {
   const [bin, setBin] = useState([0, 0, 0, 0]);
   const [hexValue, setHexValue] = useState('');
 
@@ -53,10 +53,12 @@ const HexToBin = () => {
         required
       />
       <div className="btn_container">
-        <button onClick={() => toggleBit(0)}>{bin[0]}</button>
-        <button onClick={() => toggleBit(1)}>{bin[1]}</button>
-        <button onClick={() => toggleBit(2)}>{bin[2]}</button>
-        <button onClick={() => toggleBit(3)}>{bin[3]}</button>
+        {bin.map((bit, index) => (
+          <div key={index}>
+            <button onClick={() => toggleBit(index)}>{bit}</button>
+            <p>{bitLabels[index]}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
