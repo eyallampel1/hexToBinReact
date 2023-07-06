@@ -8,9 +8,6 @@ import { useState } from 'react';
 // let bin3 = 0;
 
 
-
-
-
 const HexToBin = () => {
 
   //define onstate named bin0
@@ -24,6 +21,8 @@ const HexToBin = () => {
 
   const [hexValue, setHexValue] = useState('0');
 
+  const [validHexInput, setValidHexInput] = useState(true);
+
 
 
   //write arrow function named ConvertToBin and send to it the input value
@@ -34,15 +33,15 @@ const HexToBin = () => {
 
     let binary = parseInt(input, 16).toString(2);
     //if input is equal to NAN then set all the binary to 0
-    if (!isNaN(input)) {
-      console.log("inside NAN");
-      setBin3(0);
-      setBin2(0);
-      setBin1(0);
-      setBin0(0);
-    }
+    // if (!isNaN(input)) {
+    //   console.log("inside NAN");
+    //   setBin3(0);
+    //   setBin2(0);
+    //   setBin1(0);
+    //   setBin0(0);
+    // }
 
-    else if (input === 'a') {
+     if (input === 'a') {
       console.log("inside a");
       setBin3(1);
       setBin2(0);
@@ -153,7 +152,9 @@ const HexToBin = () => {
       setBin2(0);
       setBin1(0);
       setBin0(1);
-      setHexValue('9');
+      //setHexValue('9');
+      setValidHexInput(false);
+      console.log(event.target.value);
     }
     else {
       console.log("inside else");
@@ -161,12 +162,12 @@ const HexToBin = () => {
       setBin2(0);
       setBin1(0);
       setBin0(0);
-      setHexValue('');
+      console.log( validHexInput);
+      event.target.value = ''
+      setValidHexInput(true);
+      
+      
     }
-
-
-
-
 
     //return the binary value
     console.log(input);
@@ -179,7 +180,7 @@ const HexToBin = () => {
 
   return (
     <div className="byte_container">
-      <input type="text" className='HexInput' onChange={ConvertToBin} maxlength="1" pattern="[a-fA-F0-9]{1}" required value={hexValue}></input>
+      <input type="text" className='HexInput'  onChange={ConvertToBin} maxlength="1" pattern="[a-fA-F0-9]{1}" required ></input>
       <div className="btn_container">
         <button>{bin3}</button>
         <button>{bin2}</button>
