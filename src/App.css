@@ -1,6 +1,8 @@
-.App {
+.hex2binComp {
   display: flex;
   flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
 }
 
 .byte_container {
@@ -21,4 +23,8 @@
 .radio_label {
   display: inline-block;
   vertical-align: center;
+}
+
+h1 {
+  text-align: center;
 }

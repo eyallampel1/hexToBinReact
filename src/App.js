@@ -9,18 +9,18 @@ function App() {
 
   return (
     <React.Fragment>
-      <h1>Hex to Binary convertor</h1>
-      <div className="App">
+      <h1>Hex to Binary Convertor</h1>
+      <div className="MainApp">
 
         {LongHex ? (
-          <div>
+          <div className="hex2binComp">
             <HexToBin />
             <HexToBin />
             <HexToBin />
             <HexToBin />
           </div>
         ) : (
-          <div>
+          <div className="hex2binComp">
             <HexToBin />
             <HexToBin />
             <HexToBin />
@@ -31,18 +31,18 @@ function App() {
             <HexToBin />
           </div>
         )}
-              
+
 
       </div>
       <fieldset className='radio_container'>
         <legend>Choose length :</legend>
         <div>
           <input className='radio_input' type="radio" id="16bit" name="drone" value="16bit" defaultChecked
-            checked onClick={() => { setLongHex(false) }} />
+            onClick={() => { setLongHex(true) }} />
           <label className='radio_label'>16bit</label>
         </div>
         <div>
-          <input className='radio_input' type="radio" id="32bit" name="drone" value="32bit" onClick={() => { setLongHex(true) }} />
+          <input className='radio_input' type="radio" id="32bit" name="drone" value="32bit" onClick={() => { setLongHex(false) }} />
           <label className='radio_label'>32bit</label>
         </div>
 
