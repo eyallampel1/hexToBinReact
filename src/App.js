@@ -39,10 +39,10 @@ function App() {
         key={i}
         className="forMarginName"
         bitLabels={[
-          'Bit ' + (i * 4 + 4),
           'Bit ' + (i * 4 + 3),
           'Bit ' + (i * 4 + 2),
-          'Bit ' + (i * 4 + 1)
+          'Bit ' + (i * 4 + 1),
+          'Bit ' + (i * 4 + 0)
         ]}
       />
     ))

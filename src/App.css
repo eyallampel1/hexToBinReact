@@ -1,61 +1,89 @@
+/* Styles for the main container of HexToBin components */
 .hex2binComp {
   display: flex;
   flex-direction: row;
+  /* Arrange components in a row */
   flex-wrap: wrap;
-  /* allow the items to wrap to new lines */
+  /* Allow components to wrap to new lines */
   align-items: stretch;
+  /* Stretch items to fill the container vertically */
   justify-content: center;
+  /* Center items horizontally */
   padding: 0 30px;
-  /* add some padding on the sides to ensure there's some space there */
+  /* Add some horizontal padding for space around items */
 }
 
+/* Styles for the individual HexToBin components */
 .forMarginName {
   flex: 1 0 auto;
-  /* allow these items to flex to fill available space */
+  /* Allow these items to flex to fill available space */
   margin: 60px;
+  /* Add margin around items for spacing */
   min-width: 100px;
-  /* specify a minimum width to ensure they don't get too small */
+  /* Ensure items don't get too small */
 }
 
-
+/* Styles for byte container */
 .byte_container {
   display: flex;
   margin-bottom: 20px;
-
+  /* Add some margin at the bottom for spacing */
 }
 
-
+/* Styles for the radio button container */
 .radio_container {
-  /* //margin top  */
-
   width: 200px;
   margin: auto;
-
+  /* Center the container horizontally */
   margin-top: 20px;
-  /* Add a top margin */
+  /* Add some space at the top */
 }
 
+/* Styles for the radio buttons */
 .radio_input {
-
   display: inline-block;
   vertical-align: center;
+  /* Center align with text vertically */
   margin-right: 3%;
+  /* Add some space to the right of each button */
 }
 
+/* Styles for the labels of radio buttons */
 .radio_label {
   display: inline-block;
   vertical-align: center;
+  /* Center align with button vertically */
 }
 
+/* Styles for the heading */
 h1 {
   text-align: center;
+  /* Center the text horizontally */
 }
 
+/* Styles for the binary index number container */
 .binIndexNumberContainer {
   display: flex;
   flex-direction: row;
+  /* Arrange numbers in a row */
   align-items: stretch;
+  /* Stretch items to fill the container vertically */
   justify-content: center;
+  /* Center items horizontally */
+}
 
+/* Styles for the radio buttons when hovered over */
+.radio_input:hover {
+  cursor: pointer;
+  /* Change cursor to a pointer */
+  background-color: #f2f2f2;
+  /* Change background color */
+}
 
+/* Styles for the labels of radio buttons when hovered over */
+.radio_label:hover {
+  cursor: pointer;
+  /* Change cursor to a pointer */
+  color: #008CBA;
+  /* Change text color */
 }
