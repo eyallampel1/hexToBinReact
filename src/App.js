@@ -27,17 +27,21 @@ function App() {
   //change hex input from parent
   const [hexInput, setHexInput] = useState("");
 
+  const [userInput, setUserInput] = useState('');
+
   const handleHexMultipleChange = (event) => {
-    let input = event.target.value;
-    setHexMultiple(prev => {
-      let inputReversed = input.split('').reverse();
-      let newHexMultiple = [...prev];
-      for (let i = 0; i < bitMode; i++) {
-        newHexMultiple[i] = inputReversed[i] || '';
-      }
-      return newHexMultiple;
-    });
-  }
+    let newValue = event.target.value;
+    // Use a regular expression to filter out non-hex characters
+    let cleanedValue = newValue.replace(/[^0-9A-Fa-f]/g, '');
+    setUserInput(cleanedValue);  // update the userInput state with cleaned value
+
+    // Reverse the string and set the state
+    let newHexMultiple = Array.from(cleanedValue).reverse().join('');
+    setHexMultiple(newHexMultiple);
+  };
+
+
+
 
 
   const handleHexChange = (newValue, index) => {
@@ -72,11 +76,11 @@ function App() {
   const hexToBinComponents = Array(bitMode)
     .fill()
     .map((_, i) => {
-      let hexChar = hexMultiple[bitMode - 1 - i] || '';
+      let hexChar = hexMultiple[i] || '';
       return (
         <HexToBin
           key={i}
-          hexInput={hexMultiple[i] || ''}
+          hexInput={hexChar}
           onHexChange={(newValue) => handleHexChange(newValue, i)}
           className="forMarginName"
           bitLabels={[
@@ -86,10 +90,10 @@ function App() {
             'Bit ' + (i * 4 + 0)
           ]}
         />
-
       );
     })
     .reverse();
+
 
 
   // Generate the binary index numbers for the current bit mode
@@ -110,7 +114,7 @@ function App() {
       </div>
 
       <label>
-        Hex input: <input name="hexMultiple" value={hexMultipleInput} onChange={handleHexMultipleChange} />
+        Hex input: <input name="hexMultiple" value={userInput} onChange={handleHexMultipleChange} />
       </label>
 
 
