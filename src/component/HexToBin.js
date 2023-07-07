@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'
 import './HexToBin.css';
 
-const HexToBin = ({ bitLabels }) => {
+const HexToBin = ({ bitLabels, hexInput, onHexChange }) => {
   const [bin, setBin] = useState([0, 0, 0, 0]);
-  const [hexValue, setHexValue] = useState('');
+  const [hexValue, setHexValue] = useState(hexInput || '');
 
   const hexToBinMap = {
     '0': [0, 0, 0, 0], '1': [0, 0, 0, 1], '2': [0, 0, 1, 0], '3': [0, 0, 1, 1],
@@ -19,17 +19,39 @@ const HexToBin = ({ bitLabels }) => {
     '1100': 'c', '1101': 'd', '1110': 'e', '1111': 'f'
   };
 
+  useEffect(() => { // This useEffect will run whenever hexInput changes
+    if (hexToBinMap.hasOwnProperty(hexInput.toLowerCase())) {
+      setBin(hexToBinMap[hexInput.toLowerCase()]);
+      setHexValue(hexInput);
+    } else {
+      setBin([0, 0, 0, 0]);
+      setHexValue('');
+    }
+  }, [hexInput]); // Dependency array. This useEffect runs when hexInput changes
+
+  useEffect(() => {
+    convertToBin({ target: { value: hexInput } });
+  }, [hexInput]);
+
+  useEffect(() => {
+    onHexChange(hexValue);
+  }, [hexValue]);
+
+
+
   const convertToBin = (event) => {
     let input = event.target.value.toLowerCase();
 
     if (hexToBinMap.hasOwnProperty(input)) {
       setBin(hexToBinMap[input]);
       setHexValue(input);
+      onHexChange(input); // Notify the parent component about the change
     } else {
       setBin([0, 0, 0, 0]);
       setHexValue('');
+      onHexChange(''); // Notify the parent component about the change
     }
-  }
+  };
 
   const toggleBit = (index) => {
     setBin(prevBin => {
@@ -37,9 +59,11 @@ const HexToBin = ({ bitLabels }) => {
       newBin[index] = newBin[index] === 0 ? 1 : 0;
       let newHexValue = binToHexMap[newBin.join('')];
       setHexValue(newHexValue);
+      onHexChange(newHexValue); // Notify the parent component about the change
       return newBin;
     });
-  }
+  };
+
 
   return (
     <div className="byte_container">

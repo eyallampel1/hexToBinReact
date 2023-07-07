@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HexToBin from './component/HexToBin';
 import './App.css';
 
@@ -12,6 +12,43 @@ const BIT_MODES = {
 function App() {
   // The selected mode for bit representation, initialized to 16-bit mode
   const [bitMode, setBitMode] = useState(BIT_MODES.SHORT);
+
+  const [hexMultiple, setHexMultiple] = useState('');
+  const [hexMultipleInput, setHexMultipleInput] = useState("");
+
+  useEffect(() => {
+    let joinedValue = Array.from(hexMultiple).reverse().join('');
+    setHexMultipleInput(joinedValue);
+  }, [hexMultiple]);
+
+
+
+
+  //change hex input from parent
+  const [hexInput, setHexInput] = useState("");
+
+  const handleHexMultipleChange = (event) => {
+    let input = event.target.value;
+    setHexMultiple(prev => {
+      let inputReversed = input.split('').reverse();
+      let newHexMultiple = [...prev];
+      for (let i = 0; i < bitMode; i++) {
+        newHexMultiple[i] = inputReversed[i] || '';
+      }
+      return newHexMultiple;
+    });
+  }
+
+
+  const handleHexChange = (newValue, index) => {
+    setHexMultiple(prev => {
+      let newArray = [...prev];
+      newArray[index] = newValue;
+      return newArray;
+    });
+  };
+
+
 
   // This function is called when the bit mode is changed.
   const handleBitModeChange = event => {
@@ -34,19 +71,26 @@ function App() {
   // Generate the HexToBin components for the current bit mode, in reverse order
   const hexToBinComponents = Array(bitMode)
     .fill()
-    .map((_, i) => (
-      <HexToBin
-        key={i}
-        className="forMarginName"
-        bitLabels={[
-          'Bit ' + (i * 4 + 3),
-          'Bit ' + (i * 4 + 2),
-          'Bit ' + (i * 4 + 1),
-          'Bit ' + (i * 4 + 0)
-        ]}
-      />
-    ))
+    .map((_, i) => {
+      let hexChar = hexMultiple[bitMode - 1 - i] || '';
+      return (
+        <HexToBin
+          key={i}
+          hexInput={hexMultiple[i] || ''}
+          onHexChange={(newValue) => handleHexChange(newValue, i)}
+          className="forMarginName"
+          bitLabels={[
+            'Bit ' + (i * 4 + 3),
+            'Bit ' + (i * 4 + 2),
+            'Bit ' + (i * 4 + 1),
+            'Bit ' + (i * 4 + 0)
+          ]}
+        />
+
+      );
+    })
     .reverse();
+
 
   // Generate the binary index numbers for the current bit mode
   const binIndexNumbers = Array(bitMode).fill().map((_, i) => (
@@ -63,9 +107,14 @@ function App() {
         </div>
       </div>
       <div className="binIndexNumberContainer">
-        {/* Render the binary index numbers */}
-        {binIndexNumbers}
       </div>
+
+      <label>
+        Hex input: <input name="hexMultiple" value={hexMultipleInput} onChange={handleHexMultipleChange} />
+      </label>
+
+
+
       <fieldset className='radio_container'>
         <legend>Choose length :</legend>
         <div>
