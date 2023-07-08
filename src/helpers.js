@@ -1,6 +1,10 @@
 //gets Hex string and turns it into array of binary bits
 export const ConvertHexToBin = (hexnum) => {
-  return parseInt(hexnum, 16).toString(2).split("");
+  const converted = parseInt(hexnum, 16);
+  if (isNaN(converted)) {
+    return "";
+  }
+  return converted.toString(2).split("");
 };
 //gets Bin array and returns Hex string
 export const ConvertBinToHex = (bits_array) => {

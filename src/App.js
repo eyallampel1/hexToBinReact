@@ -1,13 +1,10 @@
 import React from "react";
 import "./App.css";
-import HexToBin from "./component/HexToBin";
 import { useState } from "react";
 import HexDisplay from "./component/HexDisplay";
 
 function App() {
   const [NumSize, setNumSize] = useState(16);
-
-  const RadioChange = (event) => {};
 
   return (
     <React.Fragment>
