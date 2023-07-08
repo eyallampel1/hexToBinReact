@@ -29,6 +29,8 @@ function App() {
 
   const handleHexMultipleChange = (event) => {
     let input = event.target.value;
+    input = input.split('').filter(char => /^[0-9a-fA-F]$/.test(char)).join(''); // Keep only valid hex characters
+
     setHexMultiple(prev => {
       let inputReversed = input.split('').reverse();
       let newHexMultiple = [...prev];
@@ -37,7 +39,8 @@ function App() {
       }
       return newHexMultiple;
     });
-  }
+  };
+
 
 
   const handleHexChange = (newValue, index) => {
