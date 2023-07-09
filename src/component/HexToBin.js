@@ -46,12 +46,7 @@ const HexToBin = (props) => {
           {props.data[3]}
         </button>
       </div>
-      <h4>
-        {`${props.index * 4 + 3}
-        ${props.index * 4 + 2}
-        ${props.index * 4 + 1}
-        ${props.index * 4 + 0}`}
-      </h4>
+      <label>{props.index * 4 + 0}</label>
     </div>
   );
 };
