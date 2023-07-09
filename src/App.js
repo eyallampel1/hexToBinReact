@@ -28,52 +28,53 @@ function App() {
         type="text"
         maxlength="16"
         value={UserInput}
-        className="input_hex"
+        className={`input_hex ${InputError ? "input_error" : ""}`}
         onChange={InputChangeHandler}
+        onBlur={() => setInputError(false)}
       ></input>
-      <fieldset className="radio_container">
-        <legend>Choose length :</legend>
-        <div>
-          <input
-            className="radio_input"
-            type="radio"
-            id="16bit"
-            name="drone"
-            value="16bit"
-            defaultChecked
-            onChange={(event) => {
-              setNumSize(parseInt(event.target.id.slice(0, 2)));
-            }}
-          />
-          <label className="radio_label">16bit</label>
-        </div>
-        <div>
-          <input
-            className="radio_input"
-            type="radio"
-            id="32bit"
-            name="drone"
-            value="32bit"
-            onChange={(event) => {
-              setNumSize(parseInt(event.target.id.slice(0, 2)));
-            }}
-          />
-          <label className="radio_label">32bit</label>
-        </div>
-        <div>
-          <input
-            className="radio_input"
-            type="radio"
-            id="64bit"
-            name="drone"
-            value="64bit"
-            onChange={(event) => {
-              setNumSize(parseInt(event.target.id.slice(0, 2)));
-            }}
-          />
-          <label className="radio_label">64bit</label>
-        </div>
-      </fieldset>
+      <div className="radio_container">
+        <input
+          className="radio_input"
+          label="16bit"
+          type="radio"
+          id="16bit"
+          name="drone"
+          value="16bit"
+          defaultChecked
+          onChange={(event) => {
+            setNumSize(parseInt(event.target.id.slice(0, 2)));
+          }}
+        />
+        {/* <label className="radio_label">16bit</label> */}
+
+        <input
+          className="radio_input"
+          label="32bit"
+          type="radio"
+          id="32bit"
+          name="drone"
+          value="32bit"
+          onChange={(event) => {
+            setNumSize(parseInt(event.target.id.slice(0, 2)));
+          }}
+        />
+        {/* <label className="radio_label">32bit</label> */}
+
+        <input
+          className="radio_input"
+          label="64bit"
+          type="radio"
+          id="64bit"
+          name="drone"
+          value="64bit"
+          onChange={(event) => {
+            setNumSize(parseInt(event.target.id.slice(0, 2)));
+          }}
+        />
+        {/* <label className="radio_label">64bit</label> */}
+      </div>
+
+      {InputError && <h4 classname="error_msg">Hex Only!</h4>}
     </React.Fragment>
   );
 }

@@ -32,20 +32,18 @@ const HexToBin = (props) => {
         onChange={ChangeHexHandler}
         maxlength="1"
       ></input>
-      <div className="btn_container">
-        <button onClick={() => props.updateBit(props.index, 3)}>
-          {props.data[0]}
-        </button>
-        <button onClick={() => props.updateBit(props.index, 2)}>
-          {props.data[1]}
-        </button>
-        <button onClick={() => props.updateBit(props.index, 1)}>
-          {props.data[2]}
-        </button>
-        <button onClick={() => props.updateBit(props.index, 0)}>
-          {props.data[3]}
-        </button>
-      </div>
+      <button onClick={() => props.updateBit(props.index, 3)}>
+        {props.data[0]}
+      </button>
+      <button onClick={() => props.updateBit(props.index, 2)}>
+        {props.data[1]}
+      </button>
+      <button onClick={() => props.updateBit(props.index, 1)}>
+        {props.data[2]}
+      </button>
+      <button onClick={() => props.updateBit(props.index, 0)}>
+        {props.data[3]}
+      </button>
       <label>{props.index * 4 + 0}</label>
     </div>
   );
