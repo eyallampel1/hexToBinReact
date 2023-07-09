@@ -28,7 +28,16 @@ const HexDisplay = (props) => {
 
   //update BitsArray when user inputs hex number
   useEffect(() => {
-    console.log(parseInt(props.user_input, 16).toString(2).padStart(64, 0));
+    if (props.user_input === "") {
+      setBitsArray(BitsArray.fill(0));
+    }
+    const UserBitArray = props.user_input.split("").map((byte) => {
+      return ConvertHexToBin(byte);
+    });
+    const temp = Array(64 - UserBitArray.length * 4)
+      .fill("0")
+      .concat(UserBitArray);
+    setBitsArray(temp.flat(1));
   }, [props.user_input]);
 
   //props.size/4 => number of HexToBin components to render.

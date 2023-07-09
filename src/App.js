@@ -26,6 +26,7 @@ function App() {
       </div>
       <input
         type="text"
+        maxlength="16"
         value={UserInput}
         onChange={InputChangeHandler}
       ></input>
