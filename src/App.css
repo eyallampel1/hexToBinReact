@@ -1,6 +1,16 @@
-.App {
+h1 {
+  text-align: center;
+}
+
+.number_display {
   display: flex;
   flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+}
+.input_hex {
+  margin-left: 50vw;
+  transform: translate(-50%);
 }
 
 .byte_container {

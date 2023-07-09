@@ -21,13 +21,14 @@ function App() {
   return (
     <React.Fragment>
       <h1>Hex to Binary convertor</h1>
-      <div className="App">
+      <div className="number_display">
         <HexDisplay size={NumSize} user_input={UserInput} />
       </div>
       <input
         type="text"
         maxlength="16"
         value={UserInput}
+        className="input_hex"
         onChange={InputChangeHandler}
       ></input>
       <fieldset className="radio_container">
