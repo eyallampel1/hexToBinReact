@@ -17,6 +17,7 @@ const HexToBin = (props) => {
     if (convertedHex) {
       setErrorFlag(false);
       setHexValue(event.target.value);
+      props.updateByte(props.index, ConvertHexToBin(event.target.value));
     } else {
       setErrorFlag(true);
     }

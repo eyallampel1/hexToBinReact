@@ -4,14 +4,31 @@ import { useState } from "react";
 import HexDisplay from "./component/HexDisplay";
 
 function App() {
+  const [UserInput, setUserInput] = useState("");
+  const [InputError, setInputError] = useState(false);
   const [NumSize, setNumSize] = useState(16);
+
+  const InputChangeHandler = (event) => {
+    const input = event.currentTarget.value;
+    if (/^[0-9a-f]+$/.test(input) || input === "") {
+      setInputError(false);
+      setUserInput(input);
+    } else {
+      setInputError(true);
+    }
+  };
 
   return (
     <React.Fragment>
       <h1>Hex to Binary convertor</h1>
       <div className="App">
-        <HexDisplay size={NumSize} />
+        <HexDisplay size={NumSize} user_input={UserInput} />
       </div>
+      <input
+        type="text"
+        value={UserInput}
+        onChange={InputChangeHandler}
+      ></input>
       <fieldset className="radio_container">
         <legend>Choose length :</legend>
         <div>
