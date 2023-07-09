@@ -1,142 +1,53 @@
-/* Styles for the body element */
-body {
-  display: flex;
-  justify-content: center;
-  /* Center the content horizontally */
-}
-
-/* Styles for the byte container */
 .byte_container {
-  display: flex;
-  flex-direction: column;
-  /* Arrange child elements in a column */
-  align-items: center;
-  /* Center child elements horizontally */
-  margin: 2em;
-  /* Add margin around the container */
-  max-width: 90%;
-  /* Limit maximum width */
-  background-color: #f8f8f8;
-  /* Set background color */
-  border: 1px solid #e7e7e7;
-  /* Add border */
-  border-radius: 8px;
-  /* Add border radius for rounded corners */
-  padding: 2em;
-  /* Add padding inside the container */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  /* Add box shadow */
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 0.5fr 0.5fr;
+  width: 130px;
+  height: 150px;
+  background-color: #454857;
+  border-radius: 15px;
+  border: 1px black solid;
 }
 
-/* Styles for the input field and label inside fieldset */
-fieldset>input,
-label {
-  margin-left: 50%;
-  /* Center align the element */
+.byte_container > label {
+  color: #eef1ef;
+  grid-row: 3;
+  grid-column: 4;
+  justify-self: center;
 }
 
-/* Styles for the Hex input field */
+.byte_container > button {
+  width: 25px;
+  height: 25px;
+  grid-row: 2;
+  align-self: center;
+  justify-self: center;
+  /* background-color: #81c14b; */
+  background-image: linear-gradient(180deg, #95d891, #74bbad);
+  border: 1px #eef1ef solid;
+}
+
+.byte_container > button:active {
+  background-image: linear-gradient(180deg, #568054, #74bbad);
+  /* background-color: #2e933c; */
+}
+
 .HexInput {
-  height: 3em;
-  width: 3em;
-  margin-bottom: 2em;
-  border: 1px solid #ddd;
-  /* Add border */
+  height: 50px;
+  width: 50px;
+  border: 1px solid black;
   border-radius: 5px;
-  /* Add border radius for rounded corners */
   text-align: center;
-  /* Center the text horizontally */
-  font-size: 2em;
-  /* Set font size */
+  font-size: 30px;
   font-weight: bold;
-  /* Set font weight */
-  color: #333;
-  /* Set text color */
-  background-color: white;
-  /* Set background color */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  /* Add box shadow */
-}
-
-/* Styles for the button container */
-.btn_container {
-  display: flex;
-  justify-content: space-between;
-  /* Distribute items evenly */
-  width: 100%;
-  /* Full width */
-}
-
-/* Styles for the div inside the button container */
-.btn_container div {
-  display: flex;
-  flex-direction: column;
-  /* Arrange child elements in a column */
-  align-items: center;
-  /* Center child elements horizontally */
-}
-
-/* Styles for the buttons inside the button container */
-.btn_container>div>button {
-  height: 2em;
-  width: 2em;
-  margin: 0.5em;
-  background-color: #4CAF50;
-  /* Set background color */
-  border: none;
-  /* No border */
-  color: white;
-  /* Set text color */
-  text-align: center;
-  /* Center the text horizontally */
-  text-decoration: none;
-  /* No text decoration */
-  display: inline-block;
-  font-size: 1em;
-  /* Set font size */
-  border-radius: 5px;
-  /* Add border radius for rounded corners */
-  cursor: pointer;
-  /* Change cursor to a pointer on hover */
-  transition-duration: 0.4s;
-  /* Set transition duration for hover effects */
-}
-
-/* Styles for the buttons on hover */
-.btn_container>div>button:hover {
-  background-color: white;
-  /* Change background color */
   color: black;
-  /* Change text color */
-  border: 2px solid #4CAF50;
-  /* Add border */
+  background-color: white;
+  grid-column: 1/-1;
+  grid-row: 1;
+  justify-self: center;
+  align-self: center;
 }
 
-/* Styles for the paragraph inside div */
-.btn_container div p {
-  margin-top: 5px;
-  font-size: 12px;
-  /* Set font size */
-}
-
-/* Styles for small devices */
-@media only screen and (max-width: 600px) {
-  .byte_container {
-    padding: 1em;
-    /* Reduce padding */
-  }
-
-  .HexInput {
-    height: 2.5em;
-    width: 2.5em;
-    font-size: 1.5em;
-    /* Reduce font size */
-  }
-
-  .btn_container>div>button {
-    height: 1.5em;
-    width: 1.5em;
-    font-size: 0.8em;
-    /* Reduce font size */
-  }
+.HexInput:focus {
+  outline: none;
 }
