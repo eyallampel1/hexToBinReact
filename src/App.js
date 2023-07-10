@@ -15,7 +15,7 @@ function App() {
   const InputChangeHandler = (event) => {
     const input = event.currentTarget.value;
     // Validate the input. It should be a hexadecimal number or empty
-    if (/^[0-9a-f]+$/.test(input) || input === "") {
+    if (/^[0-9a-fA-F]+$/.test(input) || input === "") {
       setInputError(false);  // If valid, reset the error state
       setUserInput(input);   // And set the input value
       setTrig((prev) => !prev);  // Trigger a change
