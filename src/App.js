@@ -2,27 +2,44 @@ import React from "react";
 import "./App.css";
 import { useState } from "react";
 import HexDisplay from "./component/HexDisplay";
+import { ConvertBinToHex } from "./helpers";
 
 function App() {
   const [UserInput, setUserInput] = useState("");
   const [InputError, setInputError] = useState(false);
   const [NumSize, setNumSize] = useState(16);
+  const [trig, setTrig] = useState(false);
 
   const InputChangeHandler = (event) => {
     const input = event.currentTarget.value;
     if (/^[0-9a-f]+$/.test(input) || input === "") {
       setInputError(false);
       setUserInput(input);
+      setTrig((prev) => !prev);
     } else {
       setInputError(true);
     }
+  };
+
+  const UpdateInput = (number) => {
+    const number_H = number.slice(0, 32);
+    const number_L = number.slice(32);
+    const hex_num = !(ConvertBinToHex(number_H) === "0")
+      ? ConvertBinToHex(number_H) + ConvertBinToHex(number_L)
+      : ConvertBinToHex(number_L);
+    setUserInput(hex_num);
   };
 
   return (
     <React.Fragment>
       <h1>Hex to Binary convertor</h1>
       <div className="number_display">
-        <HexDisplay size={NumSize} user_input={UserInput} />
+        <HexDisplay
+          size={NumSize}
+          user_input={UserInput}
+          trigger={trig}
+          update_handler={UpdateInput}
+        />
       </div>
       <input
         type="text"
@@ -45,7 +62,6 @@ function App() {
             setNumSize(parseInt(event.target.id.slice(0, 2)));
           }}
         />
-        {/* <label className="radio_label">16bit</label> */}
 
         <input
           className="radio_input"
@@ -58,7 +74,6 @@ function App() {
             setNumSize(parseInt(event.target.id.slice(0, 2)));
           }}
         />
-        {/* <label className="radio_label">32bit</label> */}
 
         <input
           className="radio_input"
@@ -71,7 +86,6 @@ function App() {
             setNumSize(parseInt(event.target.id.slice(0, 2)));
           }}
         />
-        {/* <label className="radio_label">64bit</label> */}
       </div>
 
       {InputError && <h4 classname="error_msg">Hex Only!</h4>}

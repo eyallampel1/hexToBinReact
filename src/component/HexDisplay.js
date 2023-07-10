@@ -12,16 +12,17 @@ const HexDisplay = (props) => {
     setBitsArray((prev) => {
       const newBits = [...prev];
       newBits[63 - index] = (newBits[63 - index] + 1) % 2;
+      props.update_handler(newBits);
       return newBits;
     });
   };
 
   const updateByte = (base, byte) => {
     const index = base * 4;
-    console.log(byte);
     setBitsArray((prev) => {
       const newBits = [...prev];
       newBits.splice(60 - index, 4, ...byte);
+      props.update_handler(newBits);
       return newBits;
     });
   };
@@ -35,10 +36,10 @@ const HexDisplay = (props) => {
       return ConvertHexToBin(byte);
     });
     const temp = Array(64 - UserBitArray.length * 4)
-      .fill("0")
+      .fill(0)
       .concat(UserBitArray);
     setBitsArray(temp.flat(1));
-  }, [props.user_input]);
+  }, [props.trigger]);
 
   //props.size/4 => number of HexToBin components to render.
   return (

@@ -35,12 +35,15 @@ const HexToBin = (props) => {
       <button onClick={() => props.updateBit(props.index, 3)}>
         {props.data[0]}
       </button>
+      <label>{props.index * 4 + 3}</label>
       <button onClick={() => props.updateBit(props.index, 2)}>
         {props.data[1]}
       </button>
+      <label>{props.index * 4 + 2}</label>
       <button onClick={() => props.updateBit(props.index, 1)}>
         {props.data[2]}
       </button>
+      <label>{props.index * 4 + 1}</label>
       <button onClick={() => props.updateBit(props.index, 0)}>
         {props.data[3]}
       </button>
