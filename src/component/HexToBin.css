@@ -1,53 +1,55 @@
+/* Styling for elements with the class "byte_container" */
 .byte_container {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr 0.5fr 0.5fr;
-  width: 130px;
-  height: 150px;
-  background-color: #454857;
-  border-radius: 15px;
-  border: 1px black solid;
+  display: grid; /* Makes the element a grid container */
+  grid-template-columns: 1fr 1fr 1fr 1fr; /* Divides the grid into four equal columns */
+  grid-template-rows: 1fr 0.5fr 0.5fr; /* Divides the grid into three rows of different sizes */
+  width: 130px; /* Sets the width of the element */
+  height: 150px; /* Sets the height of the element */
+  background-color: #454857; /* Sets the background color */
+  border-radius: 15px; /* Rounds the corners of the element */
+  border: 1px black solid; /* Sets a black border around the element */
 }
 
+/* Styling for label elements within elements with the class "byte_container" */
 .byte_container > label {
-  color: #eef1ef;
-  /* grid-row: 3;
-  grid-column: 4; */
-  justify-self: center;
+  color: #eef1ef; /* Sets the text color */
+  justify-self: center; /* Centers the element within its grid area */
 }
 
+/* Styling for button elements within elements with the class "byte_container" */
 .byte_container > button {
-  width: 25px;
-  height: 25px;
-  grid-row: 2;
-  align-self: center;
-  justify-self: center;
-  /* background-color: #81c14b; */
-  background-image: linear-gradient(180deg, #95d891, #74bbad);
-  border: 1px #eef1ef solid;
+  width: 25px; /* Sets the width of the button */
+  height: 25px; /* Sets the height of the button */
+  grid-row: 2; /* Places the button in the second grid row */
+  align-self: center; /* Centers the button vertically within its grid area */
+  justify-self: center; /* Centers the button horizontally within its grid area */
+  background-image: linear-gradient(180deg, #95d891, #74bbad); /* Sets the background to a linear gradient */
+  border: 1px #eef1ef solid; /* Sets a solid border around the button */
 }
 
+/* Styling for active button elements within elements with the class "byte_container" */
 .byte_container > button:active {
-  background-image: linear-gradient(180deg, #568054, #74bbad);
-  /* background-color: #2e933c; */
+  background-image: linear-gradient(180deg, #568054, #74bbad); /* Changes the background to a different linear gradient */
 }
 
+/* Styling for elements with the class "HexInput" */
 .HexInput {
-  height: 50px;
-  width: 50px;
-  border: 1px solid black;
-  border-radius: 5px;
-  text-align: center;
-  font-size: 30px;
-  font-weight: bold;
-  color: black;
-  background-color: white;
-  grid-column: 1/-1;
-  grid-row: 1;
-  justify-self: center;
-  align-self: center;
+  height: 50px; /* Sets the height of the input */
+  width: 50px; /* Sets the width of the input */
+  border: 1px solid black; /* Sets a black border around the input */
+  border-radius: 5px; /* Rounds the corners of the input */
+  text-align: center; /* Centers the text */
+  font-size: 30px; /* Sets the font size */
+  font-weight: bold; /* Makes the font bold */
+  color: black; /* Sets the text color */
+  background-color: white; /* Sets the background color */
+  grid-column: 1/-1; /* Spans the input across all grid columns */
+  grid-row: 1; /* Places the input in the first grid row */
+  justify-self: center; /* Centers the input horizontally within its grid area */
+  align-self: center; /* Centers the input vertically within its grid area */
 }
 
+/* Styling for focused elements with the class "HexInput" */
 .HexInput:focus {
-  outline: none;
+  outline: none; /* Removes the default outline */
 }

@@ -1,18 +1,35 @@
+/* A universal selector that applies its styles to every element */
 * {
+  /* Removes margin from all elements */
   margin: 0;
+  /* Removes padding from all elements */
   padding: 0;
 }
+
+/* The body selector applies styles to the body element */
 body {
+  /* Removes the default margin from the body */
   margin: 0;
+
+  /* Sets the font-family for the body. The browser will use the first font it has available from this list, starting from the left */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
+
+  /* Antialiased font smoothing is enabled for better font rendering in WebKit and Blink browsers */
   -webkit-font-smoothing: antialiased;
+
+  /* grayscale font smoothing is enabled for better font rendering in Firefox */
   -moz-osx-font-smoothing: grayscale;
+
+  /* Sets the background color of the body to a light gray */
   background: #eef1ef;
 }
 
+/* The code selector applies its styles to any element surrounded by <code> tags */
 code {
+  /* Sets the font family of the <code> elements to the first available font from the list */
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
