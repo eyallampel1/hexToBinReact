@@ -5,23 +5,27 @@ import HexDisplay from "./component/HexDisplay";
 import { ConvertBinToHex } from "./helpers";
 
 function App() {
+  // Define state variables
   const [UserInput, setUserInput] = useState("");
   const [InputError, setInputError] = useState(false);
   const [NumSize, setNumSize] = useState(16);
   const [trig, setTrig] = useState(false);
   const [displayMode, setDisplayMode] = useState(false); // 0 is normal 1 is flipped (MSB on right)
 
+  // Event handler for changes in the input field
   const InputChangeHandler = (event) => {
     const input = event.currentTarget.value;
-    if (/^[0-9a-f]+$/.test(input) || input === "") {
-      setInputError(false);
-      setUserInput(input);
-      setTrig((prev) => !prev);
+    // Validate the input. It should be a hexadecimal number or empty
+    if (/^[0-9a-fA-F]+$/.test(input) || input === "") {
+      setInputError(false);  // If valid, reset the error state
+      setUserInput(input);   // And set the input value
+      setTrig((prev) => !prev);  // Trigger a change
     } else {
-      setInputError(true);
+      setInputError(true);  // If not valid, set the error state
     }
   };
 
+  // Function to convert a binary array to hexadecimal and update the input field
   const UpdateInput = (number) => {
     const number_H = number.slice(0, 32);
     const number_L = number.slice(32);

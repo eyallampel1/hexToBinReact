@@ -1,73 +1,83 @@
+/* The styling for all h1 elements */
 h1 {
-  text-align: center;
+  text-align: center; /* Aligns the text to the center */
 }
 
+/* Styling for elements with the class "number_display" */
 .number_display {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  justify-content: center;
-  margin-left: 15%;
-  margin-right: 15%;
-  margin-top: 10px;
-  flex-wrap: wrap;
+  display: flex; /* Makes the element a flex container */
+  flex-direction: row; /* Places the flex items in a row */
+  gap: 10px; /* Sets a gap between the flex items */
+  justify-content: center; /* Centers the flex items on the line */
+  margin-left: 15%; /* Sets the left margin of the element */
+  margin-right: 15%; /* Sets the right margin of the element */
+  margin-top: 10px; /* Sets the top margin of the element */
+  flex-wrap: wrap; /* Allows the flex items to wrap onto multiple lines */
 }
+
+/* Styling for elements with the class "input_hex" */
 .input_hex {
-  margin-left: 50vw;
-  transform: translate(-50%);
-  border: 1px solid black;
-  margin-top: 10px;
+  margin-left: 50vw; /* Sets the left margin to 50% of the viewport's width */
+  transform: translate(-50%); /* Moves the element left by 50% of its width */
+  border: 1px solid black; /* Sets a black border around the element */
+  margin-top: 10px; /* Sets the top margin of the element */
 }
 
+/* Styling for all h4 elements */
 h4 {
-  text-align: center;
-  font-size: 20px;
-  color: red;
-  -webkit-text-stroke-width: 0.3px;
-  -webkit-text-stroke-color: black;
+  text-align: center; /* Aligns the text to the center */
+  font-size: 20px; /* Sets the font size */
+  color: red; /* Sets the text color */
+  -webkit-text-stroke-width: 0.3px; /* Sets the width of the text stroke for Webkit browsers */
+  -webkit-text-stroke-color: black; /* Sets the color of the text stroke for Webkit browsers */
 }
 
+/* Styling for elements with the class "radio_container" */
 .radio_container {
-  background: #454857;
-  padding: 4px;
-  border-radius: 3px;
+  background: #454857; /* Sets the background color */
+  padding: 4px; /* Sets the padding around the content */
+  border-radius: 3px; /* Rounds the corners of the element */
   box-shadow: inset 0 0 0 3px rgba(35, 33, 45, 0.3),
-    0 0 0 3px rgba(185, 185, 185, 0.3);
-  position: absolute;
-  max-width: 150px;
-  top: 1%;
-  left: 20%;
+              0 0 0 3px rgba(185, 185, 185, 0.3); /* Adds shadows inside and outside the element */
+  position: absolute; /* Positions the element in relation to the nearest positioned ancestor */
+  max-width: 150px; /* Sets the maximum width of the element */
+  top: 1%; /* Positions the element from the top */
+  left: 20%; /* Positions the element from the left */
 }
 
+/* Styling for input elements within elements with the class "radio_container" */
 .radio_container input {
-  width: auto;
-  height: 100%;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  outline: none;
-  cursor: pointer;
-  border-radius: 2px;
-  padding: 4px 8px;
-  background: #454857;
-  color: #bdbdbdbd;
-  font-size: 14px;
+  width: auto; /* Sets the width of the input */
+  height: 100%; /* Sets the height of the input */
+  -webkit-appearance: none; /* Removes default appearance for Webkit browsers */
+  -moz-appearance: none; /* Removes default appearance for Mozilla browsers */
+  appearance: none; /* Removes default appearance */
+  outline: none; /* Removes the default outline */
+  cursor: pointer; /* Changes the cursor to a pointer when hovering over the input */
+  border-radius: 2px; /* Rounds the corners of the input */
+  padding: 4px 8px; /* Sets the padding around the input */
+  background: #454857; /* Sets the background color */
+  color: #bdbdbdbd; /* Sets the text color */
+  font-size: 14px; /* Sets the font size */
+  /* Sets the font family */
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  transition: all 100ms linear;
+               "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+               "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  transition: all 100ms linear; /* Adds a transition effect to all properties */
 }
 
+/* Styling for checked input elements within elements with the class "radio_container" */
 .radio_container input:checked {
-  background-image: linear-gradient(180deg, #95d891, #74bbad);
-  color: #fff;
-  box-shadow: 0 1px 1px #0000002e;
-  text-shadow: 0 1px 0px #79485f7a;
+  background-image: linear-gradient(180deg, #95d891, #74bbad); /* Sets the background to a linear gradient */
+  color: #fff; /* Sets the text color */
+  box-shadow: 0 1px 1px #0000002e; /* Adds a shadow to the input */
+  text-shadow: 0 1px 0px #79485f7a; /* Adds a shadow to the text */
 }
 
+/* Styling for the ::before pseudo-element of input elements within elements with the class "radio_container" */
 .radio_container input:before {
-  content: attr(label);
-  display: inline-block;
-  text-align: center;
-  width: 100%;
+  content: attr(label); /* Inserts the value of the label attribute */
+  display: inline-block; /* Makes the element inline-block */
+  text-align: center; /* Centers the text */
+  width: 100%; /* Sets the width of the element */
 }
