@@ -23,6 +23,13 @@ const HexToBin = (props) => {
     }
   };
 
+  let index = 0;
+  if (props.displayMode) {
+    index = Math.abs(props.index - (props.size / 4 - 1));
+  } else {
+    index = props.index;
+  }
+
   return (
     <div className="byte_container">
       <input
@@ -35,19 +42,39 @@ const HexToBin = (props) => {
       <button onClick={() => props.updateBit(props.index, 3)}>
         {props.data[0]}
       </button>
-      <label>{props.index * 4 + 3}</label>
+      {/* <label>{props.index * 4 + 3}</label> */}
+      {props.displayMode ? (
+        <label>{Math.abs(props.index - (props.size / 4 - 1)) * 4 + 0}</label>
+      ) : (
+        <label>{props.index * 4 + 3}</label>
+      )}
       <button onClick={() => props.updateBit(props.index, 2)}>
         {props.data[1]}
       </button>
-      <label>{props.index * 4 + 2}</label>
+      {/* <label>{props.index * 4 + 2}</label> */}
+      {props.displayMode ? (
+        <label>{index * 4 + 1}</label>
+      ) : (
+        <label>{index * 4 + 2}</label>
+      )}
       <button onClick={() => props.updateBit(props.index, 1)}>
         {props.data[2]}
       </button>
-      <label>{props.index * 4 + 1}</label>
+      {/* <label>{props.index * 4 + 1}</label> */}
+      {props.displayMode ? (
+        <label>{index * 4 + 2}</label>
+      ) : (
+        <label>{index * 4 + 1}</label>
+      )}
       <button onClick={() => props.updateBit(props.index, 0)}>
         {props.data[3]}
       </button>
-      <label>{props.index * 4 + 0}</label>
+      {/* <label>{props.index * 4 + 0}</label> */}
+      {props.displayMode ? (
+        <label>{index * 4 + 3}</label>
+      ) : (
+        <label>{index * 4 + 0}</label>
+      )}
     </div>
   );
 };

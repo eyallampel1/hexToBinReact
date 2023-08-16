@@ -9,6 +9,7 @@ function App() {
   const [InputError, setInputError] = useState(false);
   const [NumSize, setNumSize] = useState(16);
   const [trig, setTrig] = useState(false);
+  const [displayMode, setDisplayMode] = useState(false); // 0 is normal 1 is flipped (MSB on right)
 
   const InputChangeHandler = (event) => {
     const input = event.currentTarget.value;
@@ -39,6 +40,7 @@ function App() {
           user_input={UserInput}
           trigger={trig}
           update_handler={UpdateInput}
+          displayMode={displayMode}
         />
       </div>
       <input
@@ -87,6 +89,13 @@ function App() {
           }}
         />
       </div>
+      <button
+        onClick={() => {
+          setDisplayMode((prev) => !prev);
+        }}
+      >
+        Change
+      </button>
 
       {InputError && <h4 classname="error_msg">Hex Only!</h4>}
     </React.Fragment>
