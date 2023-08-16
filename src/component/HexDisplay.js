@@ -63,6 +63,8 @@ const HexDisplay = (props) => {
           )}
           updateBit={updateBit}
           updateByte={updateByte}
+          displayMode={props.displayMode}
+          size={props.size}
         />
       ))}
     </React.Fragment>
