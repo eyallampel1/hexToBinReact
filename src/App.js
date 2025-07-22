@@ -1,109 +1,109 @@
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
-import { useState } from "react";
+
 import HexDisplay from "./component/HexDisplay";
 import { ConvertBinToHex } from "./helpers";
+import MiiCommandBuilder from "./MiiCommandBuilder";
 
 function App() {
-  // Define state variables
-  const [UserInput, setUserInput] = useState("");
-  const [InputError, setInputError] = useState(false);
-  const [NumSize, setNumSize] = useState(16);
-  const [trig, setTrig] = useState(false);
-  const [displayMode, setDisplayMode] = useState(false); // 0 is normal 1 is flipped (MSB on right)
+    // ---------------- hex‑to‑bin state ----------------
+    const [userInput,   setUserInput]   = useState("");
+    const [inputError,  setInputError]  = useState(false);
+    const [numSize,     setNumSize]     = useState(16);
+    const [trig,        setTrig]        = useState(false);
+    const [displayMode, setDisplayMode] = useState(false);
 
-  // Event handler for changes in the input field
-  const InputChangeHandler = (event) => {
-    const input = event.currentTarget.value;
-    // Validate the input. It should be a hexadecimal number or empty
-    if (/^[0-9a-fA-F]+$/.test(input) || input === "") {
-      setInputError(false);  // If valid, reset the error state
-      setUserInput(input);   // And set the input value
-      setTrig((prev) => !prev);  // Trigger a change
-    } else {
-      setInputError(true);  // If not valid, set the error state
-    }
-  };
+    // ---------------- tool selector -------------------
+    const [tool, setTool] = useState("hex");   // "hex" | "mii"
 
-  // Function to convert a binary array to hexadecimal and update the input field
-  const UpdateInput = (number) => {
-    const number_H = number.slice(0, 32);
-    const number_L = number.slice(32);
-    const hex_num = !(ConvertBinToHex(number_H) === "0")
-      ? ConvertBinToHex(number_H) + ConvertBinToHex(number_L)
-      : ConvertBinToHex(number_L);
-    setUserInput(hex_num);
-  };
+    // -------------- input handler ---------------------
+    const inputChangeHandler = (e) => {
+        const input = e.currentTarget.value;
+        if (/^[0-9a-fA-F]*$/.test(input)) {
+            setInputError(false);
+            setUserInput(input);
+            setTrig((p) => !p);
+        } else {
+            setInputError(true);
+        }
+    };
 
-  return (
-    <React.Fragment>
-      <h1>Hex to Binary convertor</h1>
-      <div className="number_display">
-        <HexDisplay
-          size={NumSize}
-          user_input={UserInput}
-          trigger={trig}
-          update_handler={UpdateInput}
-          displayMode={displayMode}
-        />
-      </div>
-      <input
-        type="text"
-        maxlength="16"
-        value={UserInput}
-        className={`input_hex ${InputError ? "input_error" : ""}`}
-        onChange={InputChangeHandler}
-        onBlur={() => setInputError(false)}
-      ></input>
-      <div className="radio_container">
-        <input
-          className="radio_input"
-          label="16bit"
-          type="radio"
-          id="16bit"
-          name="drone"
-          value="16bit"
-          defaultChecked
-          onChange={(event) => {
-            setNumSize(parseInt(event.target.id.slice(0, 2)));
-          }}
-        />
+    // -------------- update from child -----------------
+    const updateInput = (bits) => {
+        const hi = bits.slice(0, 32);
+        const lo = bits.slice(32);
+        const hex =
+            ConvertBinToHex(hi) !== "0"
+                ? ConvertBinToHex(hi) + ConvertBinToHex(lo)
+                : ConvertBinToHex(lo);
+        setUserInput(hex);
+    };
 
-        <input
-          className="radio_input"
-          label="32bit"
-          type="radio"
-          id="32bit"
-          name="drone"
-          value="32bit"
-          onChange={(event) => {
-            setNumSize(parseInt(event.target.id.slice(0, 2)));
-          }}
-        />
+    // ==================================================
+    //                       UI
+    // ==================================================
+    return (
+        <>
+            {/* simple top bar */}
+            <nav style={{ display: "flex", gap: 12, padding: 12 }}>
+                <button onClick={() => setTool("hex")}>Hex ↔ Bin</button>
+                <button onClick={() => setTool("mii")}>MII Cmd Builder</button>
+            </nav>
 
-        <input
-          className="radio_input"
-          label="64bit"
-          type="radio"
-          id="64bit"
-          name="drone"
-          value="64bit"
-          onChange={(event) => {
-            setNumSize(parseInt(event.target.id.slice(0, 2)));
-          }}
-        />
-      </div>
-      <button
-        onClick={() => {
-          setDisplayMode((prev) => !prev);
-        }}
-      >
-        Change
-      </button>
+            {/* choose tool */}
+            {tool === "hex" ? (
+                <>
+                    <h1>Hex to Binary converter</h1>
 
-      {InputError && <h4 classname="error_msg">Hex Only!</h4>}
-    </React.Fragment>
-  );
+                    {/* bit / hex viewer */}
+                    <div className="number_display">
+                        <HexDisplay
+                            size={numSize}
+                            user_input={userInput}
+                            trigger={trig}
+                            update_handler={updateInput}
+                            displayMode={displayMode}
+                        />
+                    </div>
+
+                    {/* hex input */}
+                    <input
+                        type="text"
+                        maxLength="16"
+                        value={userInput}
+                        className={`input_hex ${inputError ? "input_error" : ""}`}
+                        onChange={inputChangeHandler}
+                        onBlur={() => setInputError(false)}
+                    />
+
+                    {/* size radio buttons */}
+                    <div className="radio_container">
+                        {["16bit", "32bit", "64bit"].map((lbl) => (
+                            <label key={lbl} style={{marginRight: 12}}>
+                                <input
+                                    className="radio_input"
+                                    type="radio"
+                                    name="wordSize"
+                                    id={lbl}
+                                    defaultChecked={lbl === "16bit"}
+                                    onChange={(e) => setNumSize(parseInt(lbl, 10))}
+                                />
+                                {lbl}
+                            </label>
+                        ))}
+                    </div>
+
+
+                    {/* flip order */}
+                    <button onClick={() => setDisplayMode((p) => !p)}>Change</button>
+
+                    {inputError && <h4 className="error_msg">Hex Only!</h4>}
+                </>
+            ) : (
+                <MiiCommandBuilder/>
+            )}
+        </>
+    );
 }
 
 export default App;
