@@ -1,109 +1,349 @@
-import React, { useState } from "react";
-import "./App.css";
+import React, { useState, useMemo, useEffect } from "react";
+import BasicControlPanel from "./component/BasicControlPanel";
+import RegisterDecoderPanel from "./component/RegisterDecoderPanel";
+import FullDumpPanel from "./component/FullDumpPanel";
+import PortConfigPanel from "./component/PortConfigPanel";
+import VlanPanel from "./component/VlanPanel";
+import StatsPanel from "./component/StatsPanel";
+import HexToBinApp from "./component/HexToBinApp";
 
-import HexDisplay from "./component/HexDisplay";
-import { ConvertBinToHex } from "./helpers";
-import MiiCommandBuilder from "./MiiCommandBuilder";
-
-function App() {
-    // ---------------- hex‑to‑bin state ----------------
-    const [userInput,   setUserInput]   = useState("");
-    const [inputError,  setInputError]  = useState(false);
-    const [numSize,     setNumSize]     = useState(16);
-    const [trig,        setTrig]        = useState(false);
-    const [displayMode, setDisplayMode] = useState(false);
-
-    // ---------------- tool selector -------------------
-    const [tool, setTool] = useState("hex");   // "hex" | "mii"
-
-    // -------------- input handler ---------------------
-    const inputChangeHandler = (e) => {
-        const input = e.currentTarget.value;
-        if (/^[0-9a-fA-F]*$/.test(input)) {
-            setInputError(false);
-            setUserInput(input);
-            setTrig((p) => !p);
-        } else {
-            setInputError(true);
-        }
-    };
-
-    // -------------- update from child -----------------
-    const updateInput = (bits) => {
-        const hi = bits.slice(0, 32);
-        const lo = bits.slice(32);
-        const hex =
-            ConvertBinToHex(hi) !== "0"
-                ? ConvertBinToHex(hi) + ConvertBinToHex(lo)
-                : ConvertBinToHex(lo);
-        setUserInput(hex);
-    };
-
-    // ==================================================
-    //                       UI
-    // ==================================================
+/* ════════════════════════ helpers ════════════════════════ */
+function RawNumInput({ label, value, onChange, max = 4, disabled = false }) {
     return (
-        <>
-            {/* simple top bar */}
-            <nav style={{ display: "flex", gap: 12, padding: 12 }}>
-                <button onClick={() => setTool("hex")}>Hex ↔ Bin</button>
-                <button onClick={() => setTool("mii")}>MII Cmd Builder</button>
-            </nav>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <label style={{ fontSize: 12 }}>{label}</label>
+            <input
+                type="text"
+                value={value}
+                disabled={disabled}
+                maxLength={max}
+                onChange={(e) => onChange(e.target.value)}
+                style={{ padding: 4, fontFamily: "monospace" }}
+            />
+            <span style={{ fontSize: 10, color: "#888" }}>
+                {value.toLowerCase().startsWith("0x") || /[a-f]/i.test(value)
+                    ? "hex"
+                    : "dec"}
+            </span>
+        </div>
+    );
+}
+const NumInput = React.memo(
+    RawNumInput,
+    (p, n) => p.value === n.value && p.disabled === n.disabled
+);
 
-            {/* choose tool */}
-            {tool === "hex" ? (
-                <>
-                    <h1>Hex to Binary converter</h1>
+const toWord = (v) => {
+    if (!v) return 0;
+    const s = v.trim();
+    if (s.toLowerCase().startsWith("0x")) return parseInt(s.slice(2), 16) & 0xffff;
+    if (/[a-f]/i.test(s)) return parseInt(s, 16) & 0xffff;
+    return parseInt(s, 10) & 0xffff;
+};
 
-                    {/* bit / hex viewer */}
-                    <div className="number_display">
-                        <HexDisplay
-                            size={numSize}
-                            user_input={userInput}
-                            trigger={trig}
-                            update_handler={updateInput}
-                            displayMode={displayMode}
-                        />
+/* ════════════════════════ Register Presets Panel ════════════════════════ */
+function PresetsPanel({ onLoadPreset }) {
+    const presets = [
+        { name: "Read ID", phy: "01", reg: "02", mode: "read", desc: "PHY Identifier Register 1" },
+        { name: "Read Status", phy: "01", reg: "01", mode: "read", desc: "Basic Status Register" },
+        { name: "Enable Auto-Neg", phy: "01", reg: "00", mode: "write", data: "1200", desc: "Enable auto-negotiation" },
+        { name: "Loopback Mode", phy: "01", reg: "00", mode: "write", data: "4000", desc: "Enable loopback" },
+        { name: "Reset PHY", phy: "01", reg: "00", mode: "write", data: "8000", desc: "Software reset" },
+    ];
+
+    return (
+        <div style={{ marginTop: 32 }}>
+            <h3>⚡ Register Presets</h3>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
+                {presets.map((preset, i) => (
+                    <div key={i} style={{ 
+                        background: "#f8fafc", 
+                        border: "1px solid #e2e8f0",
+                        borderRadius: 8, 
+                        padding: 12 
+                    }}>
+                        <h4 style={{ margin: "0 0 8px 0", color: "#1f2937" }}>{preset.name}</h4>
+                        <p style={{ margin: "0 0 8px 0", fontSize: 12, color: "#6b7280" }}>{preset.desc}</p>
+                        <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 8 }}>
+                            PHY: {preset.phy} | Reg: {preset.reg} | Mode: {preset.mode}
+                            {preset.data && ` | Data: ${preset.data}`}
+                        </div>
+                        <button
+                            onClick={() => onLoadPreset(preset)}
+                            style={{
+                                padding: "6px 12px",
+                                background: "#3b82f6",
+                                color: "white",
+                                border: "none",
+                                borderRadius: 4,
+                                cursor: "pointer",
+                                fontSize: 12
+                            }}
+                        >
+                            Load Preset
+                        </button>
                     </div>
-
-                    {/* hex input */}
-                    <input
-                        type="text"
-                        maxLength="16"
-                        value={userInput}
-                        className={`input_hex ${inputError ? "input_error" : ""}`}
-                        onChange={inputChangeHandler}
-                        onBlur={() => setInputError(false)}
-                    />
-
-                    {/* size radio buttons */}
-                    <div className="radio_container">
-                        {["16bit", "32bit", "64bit"].map((lbl) => (
-                            <label key={lbl} style={{marginRight: 12}}>
-                                <input
-                                    className="radio_input"
-                                    type="radio"
-                                    name="wordSize"
-                                    id={lbl}
-                                    defaultChecked={lbl === "16bit"}
-                                    onChange={(e) => setNumSize(parseInt(lbl, 10))}
-                                />
-                                {lbl}
-                            </label>
-                        ))}
-                    </div>
-
-
-                    {/* flip order */}
-                    <button onClick={() => setDisplayMode((p) => !p)}>Change</button>
-
-                    {inputError && <h4 className="error_msg">Hex Only!</h4>}
-                </>
-            ) : (
-                <MiiCommandBuilder/>
-            )}
-        </>
+                ))}
+            </div>
+        </div>
     );
 }
 
+/* ════════════════════════ Command History Panel ════════════════════════ */
+function HistoryPanel() {
+    const [history, setHistory] = useState([]);
+
+    useEffect(() => {
+        const handleAddHistory = (event) => {
+            const command = event.detail;
+            setHistory(prev => [
+                { command, timestamp: new Date().toLocaleTimeString() },
+                ...prev.slice(0, 9) // Keep last 10 items
+            ]);
+        };
+
+        window.addEventListener('addToHistory', handleAddHistory);
+        return () => window.removeEventListener('addToHistory', handleAddHistory);
+    }, []);
+
+    const copyToClipboard = (command) => {
+        navigator.clipboard.writeText(command);
+    };
+
+    if (history.length === 0) return null;
+
+    return (
+        <div style={{ marginTop: 32, borderTop: "1px solid #e5e7eb", paddingTop: 20 }}>
+            <h3 style={{ color: "#374151", fontSize: 16, marginBottom: 12 }}>📋 Recent Commands</h3>
+            <div style={{ maxHeight: 200, overflowY: "auto" }}>
+                {history.map((item, i) => (
+                    <div key={i} style={{ 
+                        background: "#f9fafb", 
+                        padding: 8, 
+                        marginBottom: 6,
+                        borderRadius: 4,
+                        fontSize: 11,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start"
+                    }}>
+                        <div style={{ flex: 1, marginRight: 8 }}>
+                            <div style={{ color: "#6b7280", marginBottom: 2 }}>{item.timestamp}</div>
+                            <pre style={{ margin: 0, fontSize: 10, color: "#374151", whiteSpace: "pre-wrap" }}>
+                                {item.command}
+                            </pre>
+                        </div>
+                        <button
+                            onClick={() => copyToClipboard(item.command)}
+                            style={{
+                                padding: "2px 6px",
+                                background: "#e5e7eb",
+                                border: "none",
+                                borderRadius: 3,
+                                cursor: "pointer",
+                                fontSize: 9
+                            }}
+                        >
+                            Copy
+                        </button>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+/* ════════════════════════ Main Component ════════════════════════ */
+function MiiCommandBuilder() {
+    const [tab, setTab] = useState("cmd");
+    const [mode, setMode] = useState("read");
+    const [phy, setPhy] = useState("04");
+    const [reg, setReg] = useState("02");
+    const [dat, setDat] = useState("0000");
+    const [copied, setCopied] = useState(false);
+
+    const cmdWord = useMemo(() => {
+        const busy = 0x8000, c22 = 0x1000, op = mode === "read" ? 0x0800 : 0x0400;
+        const dev = (toWord(phy) & 0x1f) << 5, rg = toWord(reg) & 0x1f;
+        return (busy | c22 | op | dev | rg) & 0xffff;
+    }, [mode, phy, reg]);
+    const cmdHex = cmdWord.toString(16).padStart(4, "0").toUpperCase();
+
+    const script = useMemo(() => {
+        const out = [];
+        if (mode === "write") out.push(`# Load data`, `mii write 0x1c 0x19 0x${dat.padStart(4, "0").toUpperCase()}`);
+        out.push(`# Send command`, `mii write 0x1c 0x18 0x${cmdHex}`);
+        if (mode === "read") out.push(`# Read back`, `mii read  0x1c 0x19`);
+        return out.join("\n");
+    }, [mode, cmdHex, dat]);
+
+    const loadPreset = (preset) => {
+        setPhy(preset.phy);
+        setReg(preset.reg);
+        setMode(preset.mode);
+        if (preset.data) setDat(preset.data);
+        setTab("cmd");
+    };
+
+    const copyWithHistory = (command) => {
+        navigator.clipboard.writeText(command);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1100);
+
+        // Add to history
+        const event = new CustomEvent('addToHistory', { detail: command });
+        window.dispatchEvent(event);
+    };
+
+    return (
+        <div style={{ maxWidth: 900, margin: "2rem auto", fontFamily: "Arial, sans-serif" }}>
+            {/* Enhanced navigation */}
+            <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+                {[
+                    { key: "cmd", label: "🔧 Indirect Cmd", color: "#3b82f6" },
+                    { key: "bc", label: "⚙️ Basic Ctrl", color: "#8b5cf6" },
+                    { key: "dec", label: "🔍 Reg Decode", color: "#06b6d4" },
+                    { key: "dump", label: "📄 Full Dump", color: "#84cc16" },
+                    { key: "ports", label: "🔌 Port Config", color: "#10b981" },
+                    { key: "vlan", label: "🏷️ VLAN", color: "#6366f1" },
+                    { key: "stats", label: "📊 Statistics", color: "#f59e0b" },
+                    { key: "presets", label: "⚡ Presets", color: "#ef4444" }
+                ].map(({ key, label, color }) => (
+                    <button
+                        key={key}
+                        onClick={() => setTab(key)}
+                        style={{
+                            padding: "8px 12px",
+                            background: tab === key ? color : "#f3f4f6",
+                            color: tab === key ? "white" : "#374151",
+                            border: "none",
+                            borderRadius: 6,
+                            cursor: "pointer",
+                            fontSize: 13,
+                            fontWeight: tab === key ? "600" : "400",
+                            transition: "all 0.2s"
+                        }}
+                    >
+                        {label}
+                    </button>
+                ))}
+            </div>
+
+            {/* Tab content */}
+            {tab === "cmd" && (
+                <>
+                    <h2 style={{ textAlign: "center", color: "#1f2937" }}>MII Indirect Command Builder</h2>
+                    <div style={{ display: "flex", gap: 16, justifyContent: "center", marginTop: 12 }}>
+                        {["read", "write"].map(m => (
+                            <label key={m} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", background: mode === m ? "#dbeafe" : "#f9fafb", borderRadius: 8, cursor: "pointer" }}>
+                                <input type="radio" name="mode" value={m} checked={mode === m} onChange={() => setMode(m)} />
+                                <span style={{ textTransform: "capitalize", fontWeight: mode === m ? "600" : "400" }}>{m}</span>
+                            </label>
+                        ))}
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 12, marginTop: 20 }}>
+                        <NumInput label="PHY addr" value={phy} onChange={setPhy} />
+                        <NumInput label="Reg addr" value={reg} onChange={setReg} />
+                        <NumInput label="Data" value={dat} onChange={setDat} disabled={mode === "read"} />
+                    </div>
+                    <pre style={{ background: "#1e1e1e", color: "#00c853", padding: 12, marginTop: 20, whiteSpace: "pre-wrap", borderRadius: 6 }}>{script}</pre>
+                    <div style={{ textAlign: "right" }}>
+                        <button
+                            onClick={() => copyWithHistory(script)}
+                            style={{
+                                padding: "8px 16px",
+                                background: copied ? "#10b981" : "#3b82f6",
+                                color: "white",
+                                border: "none",
+                                borderRadius: 6,
+                                cursor: "pointer"
+                            }}
+                        >
+                            {copied ? "Copied ✅" : "Copy"}
+                        </button>
+                    </div>
+                </>
+            )}
+
+            {tab === "ports" && <PortConfigPanel phyAddr={phy} />}
+            {tab === "vlan" && <VlanPanel />}
+            {tab === "stats" && <StatsPanel phyAddr={phy} />}
+            {tab === "presets" && <PresetsPanel onLoadPreset={loadPreset} />}
+            {tab === "bc" && <BasicControlPanel />}
+            {tab === "dec" && <RegisterDecoderPanel />}
+            {tab === "dump" && <FullDumpPanel />}
+
+            <HistoryPanel />
+        </div>
+    );
+}
+
+// New main App component with toggle functionality
+function App() {
+    const [currentMode, setCurrentMode] = useState("hextobinary");
+
+    return (
+        <div>
+            {/* Mode Toggle Header */}
+            <div style={{ 
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", 
+                color: "white", 
+                padding: "20px 0",
+                textAlign: "center",
+                marginBottom: "0"
+            }}>
+                <h1 style={{ margin: "0 0 20px 0", fontSize: "28px" }}>
+                     Lampel Network Tools Suite
+                </h1>
+                <div style={{ display: "flex", gap: "0", justifyContent: "center" }}>
+                    <button
+                        onClick={() => setCurrentMode("hextobinary")}
+                        style={{
+                            padding: "12px 24px",
+                            background: currentMode === "hextobinary" ? "rgba(255,255,255,0.2)" : "transparent",
+                            color: "white",
+                            border: "2px solid rgba(255,255,255,0.3)",
+                            borderRight: "1px solid rgba(255,255,255,0.3)",
+                            borderRadius: "8px 0 0 8px",
+                            cursor: "pointer",
+                            fontSize: "16px",
+                            fontWeight: currentMode === "hextobinary" ? "600" : "400",
+                            transition: "all 0.3s ease",
+                            backdropFilter: currentMode === "hextobinary" ? "blur(10px)" : "none"
+                        }}
+                    >
+                        🔢 Hex ↔ Binary Converter
+                    </button>
+                    <button
+                        onClick={() => setCurrentMode("miicommands")}
+                        style={{
+                            padding: "12px 24px",
+                            background: currentMode === "miicommands" ? "rgba(255,255,255,0.2)" : "transparent",
+                            color: "white",
+                            border: "2px solid rgba(255,255,255,0.3)",
+                            borderLeft: "1px solid rgba(255,255,255,0.3)",
+                            borderRadius: "0 8px 8px 0",
+                            cursor: "pointer",
+                            fontSize: "16px",
+                            fontWeight: currentMode === "miicommands" ? "600" : "400",
+                            transition: "all 0.3s ease",
+                            backdropFilter: currentMode === "miicommands" ? "blur(10px)" : "none"
+                        }}
+                    >
+                        🔧 MII Command Builder
+                    </button>
+                </div>
+            </div>
+
+            {/* Content based on current mode */}
+            {currentMode === "hextobinary" ? (
+                <HexToBinApp />
+            ) : (
+                <MiiCommandBuilder />
+            )}
+        </div>
+    );
+}
+
+// Export as default
 export default App;
