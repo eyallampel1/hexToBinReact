@@ -5,6 +5,7 @@ import FullDumpPanel from "./component/FullDumpPanel";
 import PortConfigPanel from "./component/PortConfigPanel";
 import VlanPanel from "./component/VlanPanel";
 import StatsPanel from "./component/StatsPanel";
+import PHYRegisterPanel from "./component/PHYRegisterPanel";
 import HexToBinApp from "./component/HexToBinApp";
 
 /* ════════════════════════ helpers ════════════════════════ */
@@ -49,6 +50,8 @@ function PresetsPanel({ onLoadPreset }) {
         { name: "Enable Auto-Neg", phy: "01", reg: "00", mode: "write", data: "1200", desc: "Enable auto-negotiation" },
         { name: "Loopback Mode", phy: "01", reg: "00", mode: "write", data: "4000", desc: "Enable loopback" },
         { name: "Reset PHY", phy: "01", reg: "00", mode: "write", data: "8000", desc: "Software reset" },
+        { name: "Power Down PHY Port 3", phy: "03", reg: "00", mode: "write", data: "0800", desc: "Power down PHY port 3" },
+        { name: "Power Down PHY Port 4", phy: "04", reg: "00", mode: "write", data: "0800", desc: "Power down PHY port 4" },
     ];
 
     return (
@@ -201,6 +204,7 @@ function MiiCommandBuilder() {
             <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
                 {[
                     { key: "cmd", label: "🔧 Indirect Cmd", color: "#3b82f6" },
+                    { key: "phy", label: "🧬 PHY Registers", color: "#dc2626" },
                     { key: "bc", label: "⚙️ Basic Ctrl", color: "#8b5cf6" },
                     { key: "dec", label: "🔍 Reg Decode", color: "#06b6d4" },
                     { key: "dump", label: "📄 Full Dump", color: "#84cc16" },
@@ -265,6 +269,7 @@ function MiiCommandBuilder() {
                 </>
             )}
 
+            {tab === "phy" && <PHYRegisterPanel />}
             {tab === "ports" && <PortConfigPanel phyAddr={phy} />}
             {tab === "vlan" && <VlanPanel />}
             {tab === "stats" && <StatsPanel phyAddr={phy} />}
