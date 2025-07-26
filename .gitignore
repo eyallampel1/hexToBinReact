@@ -40,3 +40,4 @@ packages/react-devtools-timeline/dist
 # PHY Register Documentation - Proprietary Information
 PHY_Registers_Reference.txt
 smi_register18_19.txt
+.claude/

@@ -657,15 +657,46 @@ const saveToStorage = (key, value) => {
     }
 };
 
-function BitField({ bit, bitDef, value, onBitToggle, isReadOnly }) {
+function BitField({ bit, bitDef, value, onBitToggle, onBitRangeChange, isReadOnly }) {
     const isBitRange = typeof bit === 'string' && bit.includes(':');
     const isChecked = isBitRange ? false : (value & (1 << bit)) !== 0;
+    
+    // Parse bit range (e.g., "15:14" -> {high: 15, low: 14})
+    const getBitRange = (bitStr) => {
+        if (!isBitRange) return null;
+        const [high, low] = bitStr.split(':').map(n => parseInt(n));
+        return { high, low };
+    };
+    
+    // Extract current value from bit range
+    const getBitRangeValue = () => {
+        if (!isBitRange) return 0;
+        const range = getBitRange(bit);
+        const mask = ((1 << (range.high - range.low + 1)) - 1);
+        return (value >> range.low) & mask;
+    };
     
     const handleToggle = () => {
         if (!isReadOnly && !isBitRange) {
             onBitToggle(bit);
         }
     };
+    
+    const handleRangeChange = (e) => {
+        if (!isReadOnly && isBitRange && onBitRangeChange) {
+            const newValue = parseInt(e.target.value) || 0;
+            const range = getBitRange(bit);
+            const maxValue = (1 << (range.high - range.low + 1)) - 1;
+            
+            if (newValue <= maxValue) {
+                onBitRangeChange(bit, newValue);
+            }
+        }
+    };
+    
+    const currentRangeValue = getBitRangeValue();
+    const range = getBitRange(bit);
+    const maxRangeValue = range ? (1 << (range.high - range.low + 1)) - 1 : 0;
 
     return (
         <div style={{
@@ -673,7 +704,7 @@ function BitField({ bit, bitDef, value, onBitToggle, isReadOnly }) {
             alignItems: "center",
             padding: "6px 8px",
             margin: "2px 0",
-            background: isChecked ? "#dbeafe" : "#f8fafc",
+            background: isChecked || (isBitRange && currentRangeValue > 0) ? "#dbeafe" : "#f8fafc",
             border: "1px solid #e2e8f0",
             borderRadius: "4px",
             fontSize: "12px"
@@ -681,6 +712,8 @@ function BitField({ bit, bitDef, value, onBitToggle, isReadOnly }) {
             <div style={{ minWidth: "40px", fontWeight: "bold", color: "#374151" }}>
                 {isBitRange ? bit : `${bit}`}
             </div>
+            
+            {/* Single bit checkbox */}
             {!isBitRange && !isReadOnly && (
                 <input
                     type="checkbox"
@@ -689,10 +722,47 @@ function BitField({ bit, bitDef, value, onBitToggle, isReadOnly }) {
                     style={{ marginRight: "8px" }}
                 />
             )}
+            
+            {/* Multi-bit range input */}
+            {isBitRange && !isReadOnly && (
+                <div style={{ display: "flex", alignItems: "center", marginRight: "8px", gap: "4px" }}>
+                    <input
+                        type="number"
+                        value={currentRangeValue}
+                        onChange={handleRangeChange}
+                        min={0}
+                        max={maxRangeValue}
+                        style={{
+                            width: "50px",
+                            padding: "2px 4px",
+                            border: "1px solid #d1d5db",
+                            borderRadius: "3px",
+                            fontSize: "11px",
+                            textAlign: "center"
+                        }}
+                    />
+                    <span style={{ fontSize: "9px", color: "#6b7280" }}>
+                        (0-{maxRangeValue})
+                    </span>
+                </div>
+            )}
+            
+            {/* Read-only range value display */}
+            {isBitRange && isReadOnly && (
+                <div style={{ marginRight: "8px", fontSize: "11px", color: "#374151", fontWeight: "600" }}>
+                    Value: {currentRangeValue}
+                </div>
+            )}
+            
             <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: "600", color: "#1f2937" }}>{bitDef.name}</div>
                 <div style={{ fontSize: "10px", color: "#6b7280" }}>{bitDef.type}</div>
                 <div style={{ fontSize: "11px", color: "#374151", marginTop: "2px" }}>{bitDef.desc}</div>
+                {isBitRange && (
+                    <div style={{ fontSize: "9px", color: "#3b82f6", marginTop: "2px" }}>
+                        Current: {currentRangeValue} (0x{currentRangeValue.toString(16).toUpperCase()}) | Binary: {currentRangeValue.toString(2).padStart(range.high - range.low + 1, '0')}
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -701,6 +771,14 @@ function BitField({ bit, bitDef, value, onBitToggle, isReadOnly }) {
 function RegisterView({ pageNum, portNum, regAddr, regDef, currentValue, onValueChange, onGenerateCommand, currentPhyPage }) {
     const handleBitToggle = (bitNum) => {
         const newValue = currentValue ^ (1 << bitNum);
+        onValueChange(newValue);
+    };
+    
+    const handleBitRangeChange = (bitRange, newRangeValue) => {
+        const [high, low] = bitRange.split(':').map(n => parseInt(n));
+        const bitCount = high - low + 1;
+        const mask = ((1 << bitCount) - 1) << low;
+        const newValue = (currentValue & ~mask) | ((newRangeValue & ((1 << bitCount) - 1)) << low);
         onValueChange(newValue);
     };
 
@@ -830,6 +908,7 @@ function RegisterView({ pageNum, portNum, regAddr, regDef, currentValue, onValue
                             bitDef={bitDef}
                             value={currentValue}
                             onBitToggle={handleBitToggle}
+                            onBitRangeChange={handleBitRangeChange}
                             isReadOnly={isReadOnly}
                         />
                     );

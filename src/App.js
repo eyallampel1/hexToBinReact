@@ -44,7 +44,13 @@ const toWord = (v) => {
 
 /* ════════════════════════ Register Presets Panel ════════════════════════ */
 function PresetsPanel({ onLoadPreset }) {
-    const [selectedPort, setSelectedPort] = useState("01");
+    // Add localStorage persistence for selected port
+    const [selectedPort, setSelectedPort] = useState(() => loadFromStorageApp('presets_selectedPort', "1"));
+    
+    // Save selectedPort to localStorage whenever it changes
+    useEffect(() => {
+        saveToStorageApp('presets_selectedPort', selectedPort);
+    }, [selectedPort]);
     
     const presets = [
         { name: "Read ID", phy: "01", reg: "02", mode: "read", desc: "PHY Identifier Register 1", usePort: false },
