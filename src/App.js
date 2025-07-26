@@ -6,6 +6,9 @@ import PortConfigPanel from "./component/PortConfigPanel";
 import VlanPanel from "./component/VlanPanel";
 import StatsPanel from "./component/StatsPanel";
 import PHYRegisterPanel from "./component/PHYRegisterPanel";
+import SwitchRegisterPanel from "./component/SwitchRegisterPanel";
+import SwitchGlobal1Panel from "./component/SwitchGlobal1Panel";
+import SwitchGlobal2Panel from "./component/SwitchGlobal2Panel";
 import HexToBinApp from "./component/HexToBinApp";
 
 /* ════════════════════════ helpers ════════════════════════ */
@@ -64,14 +67,122 @@ function PresetsPanel({ onLoadPreset }) {
         { name: "Switch to Page 5", phy: "01", reg: "16", mode: "write", data: "0005", desc: "Switch PHY to Page 5 (Advanced VCT)", usePort: true },
         { name: "Switch to Page 6", phy: "01", reg: "16", mode: "write", data: "0006", desc: "Switch PHY to Page 6 (Packet Generation)", usePort: true },
         { name: "Switch to Page 7", phy: "01", reg: "16", mode: "write", data: "0007", desc: "Switch PHY to Page 7 (Cable Diagnostics)", usePort: true },
+        {
+            name: "Disable EEE Port 3",
+            sequence: [
+                "# Page 0, Reg22 = 0x0000",
+                "mii write 0x1c 0x19 0x0000",
+                "mii write 0x1c 0x18 0x9476",
+                "# Reg13 = 0x0007  (DEVAD=7, address)",
+                "mii write 0x1c 0x19 0x0007",
+                "mii write 0x1c 0x18 0x946D",
+                "# Reg14 = 0x003C",
+                "mii write 0x1c 0x19 0x003C",
+                "mii write 0x1c 0x18 0x946E",
+                "# Reg13 = 0x4007  (data mode)",
+                "mii write 0x1c 0x19 0x4007",
+                "mii write 0x1c 0x18 0x946D",
+                "# Reg14 = 0x0000",
+                "mii write 0x1c 0x19 0x0000",
+                "mii write 0x1c 0x18 0x946E",
+                "mii write 0x1c 0x19 0x9140",
+                "mii write 0x1c 0x18 0x9460"
+            ],
+            desc: "Disable Energy Efficient Ethernet (EEE) on PHY Port 3",
+            usePort: false,
+            isSequence: true
+        },
+        {
+            name: "Disable EEE Port 4",
+            sequence: [
+                "# Page 0, Reg22 = 0x0000",
+                "mii write 0x1c 0x19 0x0000",
+                "mii write 0x1c 0x18 0x9496",
+                "# Reg13 = 0x0007  (DEVAD=7, address phase)",
+                "mii write 0x1c 0x19 0x0007",
+                "mii write 0x1c 0x18 0x948D",
+                "# Reg14 = 0x003C (EEE advert register)",
+                "mii write 0x1c 0x19 0x003C",
+                "mii write 0x1c 0x18 0x948E",
+                "# Reg13 = 0x4007  (DEVAD=7, data phase)",
+                "mii write 0x1c 0x19 0x4007",
+                "mii write 0x1c 0x18 0x948D",
+                "# Reg14 = 0x0000  (disable EEE bits)",
+                "mii write 0x1c 0x19 0x0000",
+                "mii write 0x1c 0x18 0x948E",
+                "mii write 0x1c 0x19 0x9140",
+                "mii write 0x1c 0x18 0x9480"
+            ],
+            desc: "Disable Energy Efficient Ethernet (EEE) on PHY Port 4",
+            usePort: false,
+            isSequence: true
+        },
+        {
+            name: "Disable EEE Ports 3&4",
+            sequence: [
+                "# Disable EEE on Port 3",
+                "# Page 0, Reg22 = 0x0000",
+                "mii write 0x1c 0x19 0x0000",
+                "mii write 0x1c 0x18 0x9476",
+                "# Reg13 = 0x0007  (DEVAD=7, address)",
+                "mii write 0x1c 0x19 0x0007",
+                "mii write 0x1c 0x18 0x946D",
+                "# Reg14 = 0x003C",
+                "mii write 0x1c 0x19 0x003C",
+                "mii write 0x1c 0x18 0x946E",
+                "# Reg13 = 0x4007  (data mode)",
+                "mii write 0x1c 0x19 0x4007",
+                "mii write 0x1c 0x18 0x946D",
+                "# Reg14 = 0x0000",
+                "mii write 0x1c 0x19 0x0000",
+                "mii write 0x1c 0x18 0x946E",
+                "mii write 0x1c 0x19 0x9140",
+                "mii write 0x1c 0x18 0x9460",
+                "",
+                "# Disable EEE on Port 4",
+                "# Page 0, Reg22 = 0x0000",
+                "mii write 0x1c 0x19 0x0000",
+                "mii write 0x1c 0x18 0x9496",
+                "# Reg13 = 0x0007  (DEVAD=7, address phase)",
+                "mii write 0x1c 0x19 0x0007",
+                "mii write 0x1c 0x18 0x948D",
+                "# Reg14 = 0x003C (EEE advert register)",
+                "mii write 0x1c 0x19 0x003C",
+                "mii write 0x1c 0x18 0x948E",
+                "# Reg13 = 0x4007  (DEVAD=7, data phase)",
+                "mii write 0x1c 0x19 0x4007",
+                "mii write 0x1c 0x18 0x948D",
+                "# Reg14 = 0x0000  (disable EEE bits)",
+                "mii write 0x1c 0x19 0x0000",
+                "mii write 0x1c 0x18 0x948E",
+                "mii write 0x1c 0x19 0x9140",
+                "mii write 0x1c 0x18 0x9480"
+            ],
+            desc: "Disable Energy Efficient Ethernet (EEE) on both PHY Ports 3 and 4",
+            usePort: false,
+            isSequence: true
+        }
     ];
 
     const handleLoadPreset = (preset) => {
-        const modifiedPreset = { ...preset };
-        if (preset.usePort) {
-            modifiedPreset.phy = selectedPort.padStart(2, '0');
+        if (preset.isSequence) {
+            // For sequence presets, copy the entire sequence to clipboard and add to history
+            const sequence = preset.sequence.join('\n');
+            navigator.clipboard.writeText(sequence);
+            
+            // Add to history
+            const event = new CustomEvent('addToHistory', { detail: sequence });
+            window.dispatchEvent(event);
+            
+            // Show feedback (you could add a toast notification here if desired)
+            console.log(`Loaded sequence preset: ${preset.name}`);
+        } else {
+            const modifiedPreset = { ...preset };
+            if (preset.usePort) {
+                modifiedPreset.phy = selectedPort.padStart(2, '0');
+            }
+            onLoadPreset(modifiedPreset);
         }
-        onLoadPreset(modifiedPreset);
     };
 
     return (
@@ -127,19 +238,32 @@ function PresetsPanel({ onLoadPreset }) {
                             {preset.portSpecific ? preset.desc.replace("selected", `port ${selectedPort}`) : preset.desc}
                         </p>
                         <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 8 }}>
-                            PHY: {preset.usePort ? selectedPort.padStart(2, '0') : preset.phy} | Reg: {preset.reg} | Mode: {preset.mode}
-                            {preset.data && ` | Data: ${preset.data}`}
-                            {preset.usePort && (
-                                <div style={{ color: "#3b82f6", marginTop: 2 }}>
-                                    🔌 Uses selected port
+                            {preset.isSequence ? (
+                                <div>
+                                    <div style={{ color: "#dc2626", fontWeight: "600", marginBottom: 2 }}>
+                                        🔄 Multi-command sequence ({preset.sequence.length} commands)
+                                    </div>
+                                    <div style={{ color: "#7c2d12" }}>
+                                        Copies sequence to clipboard automatically
+                                    </div>
                                 </div>
+                            ) : (
+                                <>
+                                    PHY: {preset.usePort ? selectedPort.padStart(2, '0') : preset.phy} | Reg: {preset.reg} | Mode: {preset.mode}
+                                    {preset.data && ` | Data: ${preset.data}`}
+                                    {preset.usePort && (
+                                        <div style={{ color: "#3b82f6", marginTop: 2 }}>
+                                            🔌 Uses selected port
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
                         <button
                             onClick={() => handleLoadPreset(preset)}
                             style={{
                                 padding: "6px 12px",
-                                background: "#3b82f6",
+                                background: preset.isSequence ? "#dc2626" : "#3b82f6",
                                 color: "white",
                                 border: "none",
                                 borderRadius: 4,
@@ -147,7 +271,7 @@ function PresetsPanel({ onLoadPreset }) {
                                 fontSize: 12
                             }}
                         >
-                            Load Preset
+                            {preset.isSequence ? "Copy Sequence" : "Load Preset"}
                         </button>
                     </div>
                 ))}
@@ -299,7 +423,10 @@ function MiiCommandBuilder() {
                 {[
                     { key: "cmd", label: "🔧 Indirect Cmd", color: "#3b82f6" },
                     { key: "phy", label: "🧬 PHY Registers", color: "#dc2626" },
-                    { key: "bc", label: "⚙️ Basic Ctrl", color: "#8b5cf6" },
+                    { key: "switch", label: "🔀 Switch Registers", color: "#7c3aed" },
+                    { key: "global1", label: "🌐 Switch Global1", color: "#8b5cf6" },
+                    { key: "global2", label: "🌍 Switch Global2", color: "#06b6d4" },
+                    { key: "bc", label: "⚙️ Basic Ctrl", color: "#059669" },
                     { key: "dec", label: "🔍 Reg Decode", color: "#06b6d4" },
                     { key: "dump", label: "📄 Full Dump", color: "#84cc16" },
                     { key: "ports", label: "🔌 Port Config", color: "#10b981" },
@@ -364,6 +491,9 @@ function MiiCommandBuilder() {
             )}
 
             {tab === "phy" && <PHYRegisterPanel />}
+            {tab === "switch" && <SwitchRegisterPanel />}
+            {tab === "global1" && <SwitchGlobal1Panel />}
+            {tab === "global2" && <SwitchGlobal2Panel />}
             {tab === "ports" && <PortConfigPanel phyAddr={phy} />}
             {tab === "vlan" && <VlanPanel />}
             {tab === "stats" && <StatsPanel phyAddr={phy} />}
@@ -398,7 +528,7 @@ function App() {
                 marginBottom: "0"
             }}>
                 <h1 style={{ margin: "0 0 20px 0", fontSize: "28px" }}>
-                     Lampel Network Tools Suite
+                    <span style={{ color: "#ff4444" }}>Lampel</span> Network Tools Suite
                 </h1>
                 <div style={{ display: "flex", gap: "0", justifyContent: "center" }}>
                     <button
@@ -446,6 +576,25 @@ function App() {
             ) : (
                 <MiiCommandBuilder />
             )}
+
+            {/* Creator Attribution - Always Visible */}
+            <div style={{
+                position: "fixed",
+                bottom: "20px",
+                right: "20px",
+                background: "rgba(0, 0, 0, 0.8)",
+                color: "white",
+                padding: "8px 16px",
+                borderRadius: "8px",
+                fontSize: "12px",
+                fontWeight: "500",
+                backdropFilter: "blur(10px)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                zIndex: 1000,
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)"
+            }}>
+                Created By <span style={{ color: "#ff4444", fontWeight: "600" }}>Eyal Lampel</span>
+            </div>
         </div>
     );
 }

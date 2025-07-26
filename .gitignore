@@ -41,3 +41,9 @@ packages/react-devtools-timeline/dist
 PHY_Registers_Reference.txt
 smi_register18_19.txt
 .claude/
+1c_1d_1f.png
+global1_registers.txt
+global2_registers.txt
+switch_registers_global_1.pdf
+switch_registers_global_2.pdf
+switch_registers_without_global.pdf
