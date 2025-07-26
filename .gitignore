@@ -36,3 +36,7 @@ packages/react-devtools-extensions/.tempUserDataDir
 packages/react-devtools-inline/dist
 packages/react-devtools-shell/dist
 packages/react-devtools-timeline/dist
+
+# PHY Register Documentation - Proprietary Information
+PHY_Registers_Reference.txt
+smi_register18_19.txt

@@ -44,19 +44,70 @@ const toWord = (v) => {
 
 /* ════════════════════════ Register Presets Panel ════════════════════════ */
 function PresetsPanel({ onLoadPreset }) {
+    const [selectedPort, setSelectedPort] = useState("01");
+    
     const presets = [
-        { name: "Read ID", phy: "01", reg: "02", mode: "read", desc: "PHY Identifier Register 1" },
-        { name: "Read Status", phy: "01", reg: "01", mode: "read", desc: "Basic Status Register" },
-        { name: "Enable Auto-Neg", phy: "01", reg: "00", mode: "write", data: "1200", desc: "Enable auto-negotiation" },
-        { name: "Loopback Mode", phy: "01", reg: "00", mode: "write", data: "4000", desc: "Enable loopback" },
-        { name: "Reset PHY", phy: "01", reg: "00", mode: "write", data: "8000", desc: "Software reset" },
-        { name: "Power Down PHY Port 3", phy: "03", reg: "00", mode: "write", data: "0800", desc: "Power down PHY port 3" },
-        { name: "Power Down PHY Port 4", phy: "04", reg: "00", mode: "write", data: "0800", desc: "Power down PHY port 4" },
+        { name: "Read ID", phy: "01", reg: "02", mode: "read", desc: "PHY Identifier Register 1", usePort: false },
+        { name: "Read Status", phy: "01", reg: "01", mode: "read", desc: "Basic Status Register", usePort: true },
+        { name: "Enable Auto-Neg", phy: "01", reg: "00", mode: "write", data: "1200", desc: "Enable auto-negotiation", usePort: true },
+        { name: "Loopback Mode", phy: "01", reg: "00", mode: "write", data: "4000", desc: "Enable loopback", usePort: true },
+        { name: "Reset PHY", phy: "01", reg: "00", mode: "write", data: "8000", desc: "Software reset", usePort: true },
+        { name: "Power Down PHY", phy: "01", reg: "00", mode: "write", data: "0800", desc: "Power down selected PHY port", usePort: true, portSpecific: true },
+        { name: "Switch to Page 0", phy: "01", reg: "16", mode: "write", data: "0000", desc: "Switch PHY to Page 0 (Basic Control/Status)", usePort: true },
+        { name: "Switch to Page 2", phy: "01", reg: "16", mode: "write", data: "0002", desc: "Switch PHY to Page 2 (MAC Specific Control)", usePort: true },
+        { name: "Switch to Page 5", phy: "01", reg: "16", mode: "write", data: "0005", desc: "Switch PHY to Page 5 (Advanced VCT)", usePort: true },
+        { name: "Switch to Page 6", phy: "01", reg: "16", mode: "write", data: "0006", desc: "Switch PHY to Page 6 (Packet Generation)", usePort: true },
+        { name: "Switch to Page 7", phy: "01", reg: "16", mode: "write", data: "0007", desc: "Switch PHY to Page 7 (Cable Diagnostics)", usePort: true },
     ];
+
+    const handleLoadPreset = (preset) => {
+        const modifiedPreset = { ...preset };
+        if (preset.usePort) {
+            modifiedPreset.phy = selectedPort.padStart(2, '0');
+        }
+        onLoadPreset(modifiedPreset);
+    };
 
     return (
         <div style={{ marginTop: 32 }}>
             <h3>⚡ Register Presets</h3>
+            
+            {/* Port Selection */}
+            <div style={{ 
+                background: "#e0f2fe", 
+                padding: "12px", 
+                borderRadius: "8px", 
+                marginBottom: "16px",
+                border: "1px solid #0ea5e9"
+            }}>
+                <h4 style={{ margin: "0 0 8px 0", color: "#0c4a6e" }}>🔌 Port Selection</h4>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <label style={{ fontSize: "14px", fontWeight: "600", color: "#374151" }}>
+                        Target Port:
+                    </label>
+                    <select
+                        value={selectedPort}
+                        onChange={(e) => setSelectedPort(e.target.value)}
+                        style={{
+                            padding: "6px 10px",
+                            border: "1px solid #d1d5db",
+                            borderRadius: "4px",
+                            fontSize: "14px",
+                            fontFamily: "monospace"
+                        }}
+                    >
+                        {[0, 1, 2, 3, 4, 5, 6, 7].map(port => (
+                            <option key={port} value={port.toString()}>
+                                Port {port}
+                            </option>
+                        ))}
+                    </select>
+                    <span style={{ fontSize: "12px", color: "#6b7280" }}>
+                        (Applies to PHY register commands)
+                    </span>
+                </div>
+            </div>
+
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
                 {presets.map((preset, i) => (
                     <div key={i} style={{ 
@@ -66,13 +117,20 @@ function PresetsPanel({ onLoadPreset }) {
                         padding: 12 
                     }}>
                         <h4 style={{ margin: "0 0 8px 0", color: "#1f2937" }}>{preset.name}</h4>
-                        <p style={{ margin: "0 0 8px 0", fontSize: 12, color: "#6b7280" }}>{preset.desc}</p>
+                        <p style={{ margin: "0 0 8px 0", fontSize: 12, color: "#6b7280" }}>
+                            {preset.portSpecific ? preset.desc.replace("selected", `port ${selectedPort}`) : preset.desc}
+                        </p>
                         <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 8 }}>
-                            PHY: {preset.phy} | Reg: {preset.reg} | Mode: {preset.mode}
+                            PHY: {preset.usePort ? selectedPort.padStart(2, '0') : preset.phy} | Reg: {preset.reg} | Mode: {preset.mode}
                             {preset.data && ` | Data: ${preset.data}`}
+                            {preset.usePort && (
+                                <div style={{ color: "#3b82f6", marginTop: 2 }}>
+                                    🔌 Uses selected port
+                                </div>
+                            )}
                         </div>
                         <button
-                            onClick={() => onLoadPreset(preset)}
+                            onClick={() => handleLoadPreset(preset)}
                             style={{
                                 padding: "6px 12px",
                                 background: "#3b82f6",
@@ -156,14 +214,44 @@ function HistoryPanel() {
     );
 }
 
+/* ════════════════════════ localStorage helpers ════════════════════════ */
+const APP_STORAGE_KEYS = {
+    currentMode: 'app_currentMode',
+    miiTab: 'mii_currentTab'
+};
+
+const loadFromStorageApp = (key, defaultValue) => {
+    try {
+        const stored = localStorage.getItem(key);
+        return stored ? JSON.parse(stored) : defaultValue;
+    } catch (e) {
+        console.warn(`Failed to load ${key} from localStorage:`, e);
+        return defaultValue;
+    }
+};
+
+const saveToStorageApp = (key, value) => {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        console.warn(`Failed to save ${key} to localStorage:`, e);
+    }
+};
+
 /* ════════════════════════ Main Component ════════════════════════ */
 function MiiCommandBuilder() {
-    const [tab, setTab] = useState("cmd");
+    // Initialize tab from localStorage
+    const [tab, setTab] = useState(() => loadFromStorageApp(APP_STORAGE_KEYS.miiTab, "cmd"));
     const [mode, setMode] = useState("read");
     const [phy, setPhy] = useState("04");
     const [reg, setReg] = useState("02");
     const [dat, setDat] = useState("0000");
     const [copied, setCopied] = useState(false);
+
+    // Save tab state to localStorage whenever it changes
+    useEffect(() => {
+        saveToStorageApp(APP_STORAGE_KEYS.miiTab, tab);
+    }, [tab]);
 
     const cmdWord = useMemo(() => {
         const busy = 0x8000, c22 = 0x1000, op = mode === "read" ? 0x0800 : 0x0400;
@@ -285,7 +373,13 @@ function MiiCommandBuilder() {
 
 // New main App component with toggle functionality
 function App() {
-    const [currentMode, setCurrentMode] = useState("hextobinary");
+    // Initialize currentMode from localStorage
+    const [currentMode, setCurrentMode] = useState(() => loadFromStorageApp(APP_STORAGE_KEYS.currentMode, "hextobinary"));
+
+    // Save currentMode to localStorage whenever it changes
+    useEffect(() => {
+        saveToStorageApp(APP_STORAGE_KEYS.currentMode, currentMode);
+    }, [currentMode]);
 
     return (
         <div>

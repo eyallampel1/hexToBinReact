@@ -14,19 +14,49 @@ export default function FullDumpPanel() {
             const start = toWord(startPhy) & 0x1f;
             const end = toWord(endPhy) & 0x1f;
 
-            lines.push("echo '=== PHY Register Dump ==='");
+            lines.push("echo '=== PHY Register Dump with Page Switching ==='");
             lines.push(`for phy in $(seq ${start} ${end}); do`);
             lines.push("  echo \"\"");
             lines.push("  echo \"PHY Address: $phy\"");
-            lines.push("  echo \"----------------\"");
+            lines.push("  echo \"======================\"");
+            
+            // Define available pages and their descriptions
+            const pages = [
+                { page: 0, name: "Basic Control/Status" },
+                { page: 2, name: "MAC Specific Control" },
+                { page: 5, name: "Advanced VCT" },
+                { page: 6, name: "Packet Generation" },
+                { page: 7, name: "Cable Diagnostics" }
+            ];
 
-            const [regStart, regEnd] = regRange.split("-").map(n => parseInt(n) || 0);
-            lines.push(`  for reg in $(seq ${regStart} ${regEnd}); do`);
-            lines.push("    val=$(mii read $phy $reg 2>/dev/null | tail -n1)");
-            lines.push("    if [ ! -z \"$val\" ]; then");
-            lines.push("      printf \"  Reg 0x%02X: %s\\n\" $reg \"$val\"");
-            lines.push("    fi");
-            lines.push("  done");
+            // Loop through each page
+            pages.forEach(({ page, name }) => {
+                lines.push("  echo \"\"");
+                lines.push(`  echo \"  Page ${page} - ${name}\"`);
+                lines.push("  echo \"  ------------------------\"");
+                
+                // Switch to the specific page using SMI indirect access
+                lines.push(`  # Switch to page ${page}`);
+                lines.push(`  mii write 0x1c 0x19 0x$(printf "%04X" ${page}) 2>/dev/null`);
+                lines.push(`  mii write 0x1c 0x18 0x$(printf "%04X" $((0x9400 | ($phy << 5) | 0x16))) 2>/dev/null`);
+                lines.push("  sleep 0.01  # Brief delay for page switch");
+                
+                // Read registers from this page
+                const [regStart, regEnd] = regRange.split("-").map(n => parseInt(n) || 0);
+                lines.push(`  for reg in $(seq ${regStart} ${regEnd}); do`);
+                lines.push("    # Read register using SMI indirect access");
+                lines.push(`    mii write 0x1c 0x18 0x$(printf "%04X" $((0x9800 | ($phy << 5) | $reg))) 2>/dev/null`);
+                lines.push("    val=$(mii read 0x1c 0x19 2>/dev/null | tail -n1)");
+                lines.push("    if [ ! -z \"$val\" ]; then");
+                lines.push("      printf \"    Reg 0x%02X: %s\\n\" $reg \"$val\"");
+                lines.push("    fi");
+                lines.push("  done");
+            });
+            
+            lines.push("  echo \"\"");
+            lines.push("  # Reset to page 0 after dump");
+            lines.push("  mii write 0x1c 0x19 0x0000 2>/dev/null");
+            lines.push("  mii write 0x1c 0x18 0x$(printf \"%04X\" $((0x9400 | ($phy << 5) | 0x16))) 2>/dev/null");
             lines.push("done");
         }
 

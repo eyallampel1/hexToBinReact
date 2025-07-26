@@ -1,14 +1,60 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import HexDisplay from "./HexDisplay";
 import { ConvertBinToHex } from "../helpers";
 import "./HexToBin.css";
 
+// localStorage helper functions for HexToBinApp
+const HEX_STORAGE_KEYS = {
+  userInput: 'hexToBin_userInput',
+  bitSize: 'hexToBin_bitSize',
+  displayMode: 'hexToBin_displayMode'
+};
+
+const loadFromStorageHex = (key, defaultValue) => {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : defaultValue;
+  } catch (e) {
+    console.warn(`Failed to load ${key} from localStorage:`, e);
+    return defaultValue;
+  }
+};
+
+const saveToStorageHex = (key, value) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (e) {
+    console.warn(`Failed to save ${key} to localStorage:`, e);
+  }
+};
+
 const HexToBinApp = () => {
-  const [userInput, setUserInput] = useState("");
+  // Initialize state from localStorage
+  const [userInput, setUserInput] = useState(() => loadFromStorageHex(HEX_STORAGE_KEYS.userInput, ""));
   const [bitsArray, setBitsArray] = useState(Array(64).fill(0));
   const [trigger, setTrigger] = useState(0);
-  const [displayMode, setDisplayMode] = useState(false);
-  const [bitSize, setBitSize] = useState(16);
+  const [displayMode, setDisplayMode] = useState(() => loadFromStorageHex(HEX_STORAGE_KEYS.displayMode, false));
+  const [bitSize, setBitSize] = useState(() => loadFromStorageHex(HEX_STORAGE_KEYS.bitSize, 16));
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    saveToStorageHex(HEX_STORAGE_KEYS.userInput, userInput);
+  }, [userInput]);
+
+  useEffect(() => {
+    saveToStorageHex(HEX_STORAGE_KEYS.bitSize, bitSize);
+  }, [bitSize]);
+
+  useEffect(() => {
+    saveToStorageHex(HEX_STORAGE_KEYS.displayMode, displayMode);
+  }, [displayMode]);
+
+  // Trigger initial conversion when component mounts with stored userInput
+  useEffect(() => {
+    if (userInput) {
+      setTrigger(prev => prev + 1);
+    }
+  }, []); // Only run on mount
 
   const updateHandler = (newBits) => {
     setBitsArray(newBits);
