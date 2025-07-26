@@ -50,23 +50,116 @@ function PresetsPanel({ onLoadPreset }) {
     // Add localStorage persistence for selected port
     const [selectedPort, setSelectedPort] = useState(() => loadFromStorageApp('presets_selectedPort', "1"));
     
+    // Custom preset management
+    const [customPresets, setCustomPresets] = useState(() => loadFromStorageApp('custom_presets', []));
+    const [currentUser, setCurrentUser] = useState(() => loadFromStorageApp('current_user', ""));
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [editingPreset, setEditingPreset] = useState(null);
+    const [newPresetName, setNewPresetName] = useState("");
+    const [newPresetContent, setNewPresetContent] = useState("");
+    const [newPresetDesc, setNewPresetDesc] = useState("");
+    
     // Save selectedPort to localStorage whenever it changes
     useEffect(() => {
         saveToStorageApp('presets_selectedPort', selectedPort);
     }, [selectedPort]);
     
-    const presets = [
-        { name: "Read ID", phy: "01", reg: "02", mode: "read", desc: "PHY Identifier Register 1", usePort: false },
-        { name: "Read Status", phy: "01", reg: "01", mode: "read", desc: "Basic Status Register", usePort: true },
-        { name: "Enable Auto-Neg", phy: "01", reg: "00", mode: "write", data: "1200", desc: "Enable auto-negotiation", usePort: true },
-        { name: "Loopback Mode", phy: "01", reg: "00", mode: "write", data: "4000", desc: "Enable loopback", usePort: true },
-        { name: "Reset PHY", phy: "01", reg: "00", mode: "write", data: "8000", desc: "Software reset", usePort: true },
-        { name: "Power Down PHY", phy: "01", reg: "00", mode: "write", data: "0800", desc: "Power down selected PHY port", usePort: true, portSpecific: true },
-        { name: "Switch to Page 0", phy: "01", reg: "16", mode: "write", data: "0000", desc: "Switch PHY to Page 0 (Basic Control/Status)", usePort: true },
-        { name: "Switch to Page 2", phy: "01", reg: "16", mode: "write", data: "0002", desc: "Switch PHY to Page 2 (MAC Specific Control)", usePort: true },
-        { name: "Switch to Page 5", phy: "01", reg: "16", mode: "write", data: "0005", desc: "Switch PHY to Page 5 (Advanced VCT)", usePort: true },
-        { name: "Switch to Page 6", phy: "01", reg: "16", mode: "write", data: "0006", desc: "Switch PHY to Page 6 (Packet Generation)", usePort: true },
-        { name: "Switch to Page 7", phy: "01", reg: "16", mode: "write", data: "0007", desc: "Switch PHY to Page 7 (Cable Diagnostics)", usePort: true },
+    // Save custom presets to localStorage whenever they change
+    useEffect(() => {
+        saveToStorageApp('custom_presets', customPresets);
+    }, [customPresets]);
+    
+    // Save current user to localStorage whenever it changes
+    useEffect(() => {
+        saveToStorageApp('current_user', currentUser);
+    }, [currentUser]);
+    
+    // Custom preset management functions
+    const addCustomPreset = () => {
+        if (!newPresetName.trim() || !newPresetContent.trim() || !currentUser.trim()) {
+            alert("Please fill in all fields including your username!");
+            return;
+        }
+        
+        const newPreset = {
+            id: Date.now().toString(),
+            name: newPresetName.trim(),
+            content: newPresetContent.trim(),
+            desc: newPresetDesc.trim() || "Custom user preset",
+            createdBy: currentUser.trim(),
+            createdAt: new Date().toLocaleDateString(),
+            isCustom: true,
+            isSequence: true,
+            sequence: newPresetContent.trim().split('\n').filter(line => line.trim() !== '')
+        };
+        
+        setCustomPresets(prev => [...prev, newPreset]);
+        setNewPresetName("");
+        setNewPresetContent("");
+        setNewPresetDesc("");
+        setShowAddForm(false);
+    };
+    
+    const editCustomPreset = (preset) => {
+        setEditingPreset(preset);
+        setNewPresetName(preset.name);
+        setNewPresetContent(preset.content);
+        setNewPresetDesc(preset.desc);
+        setShowAddForm(true);
+    };
+    
+    const saveEditedPreset = () => {
+        if (!newPresetName.trim() || !newPresetContent.trim()) {
+            alert("Please fill in all required fields!");
+            return;
+        }
+        
+        setCustomPresets(prev => prev.map(preset => 
+            preset.id === editingPreset.id 
+                ? {
+                    ...preset,
+                    name: newPresetName.trim(),
+                    content: newPresetContent.trim(),
+                    desc: newPresetDesc.trim() || "Custom user preset",
+                    sequence: newPresetContent.trim().split('\n').filter(line => line.trim() !== '')
+                }
+                : preset
+        ));
+        
+        setEditingPreset(null);
+        setNewPresetName("");
+        setNewPresetContent("");
+        setNewPresetDesc("");
+        setShowAddForm(false);
+    };
+    
+    const deleteCustomPreset = (presetId) => {
+        if (window.confirm("Are you sure you want to delete this custom preset?")) {
+            setCustomPresets(prev => prev.filter(preset => preset.id !== presetId));
+        }
+    };
+    
+    const cancelEdit = () => {
+        setEditingPreset(null);
+        setNewPresetName("");
+        setNewPresetContent("");
+        setNewPresetDesc("");
+        setShowAddForm(false);
+    };
+    
+    // System presets (non-deletable)
+    const systemPresets = [
+        { name: "Read ID", phy: "01", reg: "02", mode: "read", desc: "PHY Identifier Register 1", usePort: false, isSystem: true },
+        { name: "Read Status", phy: "01", reg: "01", mode: "read", desc: "Basic Status Register", usePort: true, isSystem: true },
+        { name: "Enable Auto-Neg", phy: "01", reg: "00", mode: "write", data: "1200", desc: "Enable auto-negotiation", usePort: true, isSystem: true },
+        { name: "Loopback Mode", phy: "01", reg: "00", mode: "write", data: "4000", desc: "Enable loopback", usePort: true, isSystem: true },
+        { name: "Reset PHY", phy: "01", reg: "00", mode: "write", data: "8000", desc: "Software reset", usePort: true, isSystem: true },
+        { name: "Power Down PHY", phy: "01", reg: "00", mode: "write", data: "0800", desc: "Power down selected PHY port", usePort: true, portSpecific: true, isSystem: true },
+        { name: "Switch to Page 0", phy: "01", reg: "16", mode: "write", data: "0000", desc: "Switch PHY to Page 0 (Basic Control/Status)", usePort: true, isSystem: true },
+        { name: "Switch to Page 2", phy: "01", reg: "16", mode: "write", data: "0002", desc: "Switch PHY to Page 2 (MAC Specific Control)", usePort: true, isSystem: true },
+        { name: "Switch to Page 5", phy: "01", reg: "16", mode: "write", data: "0005", desc: "Switch PHY to Page 5 (Advanced VCT)", usePort: true, isSystem: true },
+        { name: "Switch to Page 6", phy: "01", reg: "16", mode: "write", data: "0006", desc: "Switch PHY to Page 6 (Packet Generation)", usePort: true, isSystem: true },
+        { name: "Switch to Page 7", phy: "01", reg: "16", mode: "write", data: "0007", desc: "Switch PHY to Page 7 (Cable Diagnostics)", usePort: true, isSystem: true },
         {
             name: "Disable EEE Port 3",
             sequence: [
@@ -90,7 +183,8 @@ function PresetsPanel({ onLoadPreset }) {
             ],
             desc: "Disable Energy Efficient Ethernet (EEE) on PHY Port 3",
             usePort: false,
-            isSequence: true
+            isSequence: true,
+            isSystem: true
         },
         {
             name: "Disable EEE Port 4",
@@ -115,7 +209,8 @@ function PresetsPanel({ onLoadPreset }) {
             ],
             desc: "Disable Energy Efficient Ethernet (EEE) on PHY Port 4",
             usePort: false,
-            isSequence: true
+            isSequence: true,
+            isSystem: true
         },
         {
             name: "Disable EEE Ports 3&4",
@@ -160,14 +255,18 @@ function PresetsPanel({ onLoadPreset }) {
             ],
             desc: "Disable Energy Efficient Ethernet (EEE) on both PHY Ports 3 and 4",
             usePort: false,
-            isSequence: true
+            isSequence: true,
+            isSystem: true
         }
     ];
+    
+    // Combine system and custom presets
+    const allPresets = [...systemPresets, ...customPresets];
 
     const handleLoadPreset = (preset) => {
         if (preset.isSequence) {
             // For sequence presets, copy the entire sequence to clipboard and add to history
-            const sequence = preset.sequence.join('\n');
+            const sequence = preset.isCustom ? preset.content : preset.sequence.join('\n');
             navigator.clipboard.writeText(sequence);
             
             // Add to history
@@ -189,6 +288,50 @@ function PresetsPanel({ onLoadPreset }) {
         <div style={{ marginTop: 32 }}>
             <h3>⚡ Register Presets</h3>
             
+            {/* User Management */}
+            <div style={{ 
+                background: "#f0f9ff", 
+                padding: "12px", 
+                borderRadius: "8px", 
+                marginBottom: "16px",
+                border: "1px solid #0ea5e9"
+            }}>
+                <h4 style={{ margin: "0 0 8px 0", color: "#0c4a6e" }}>👤 User Settings</h4>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                    <label style={{ fontSize: "14px", fontWeight: "600", color: "#374151" }}>
+                        Your Name:
+                    </label>
+                    <input
+                        type="text"
+                        value={currentUser}
+                        onChange={(e) => setCurrentUser(e.target.value)}
+                        placeholder="Enter your name (e.g., Eyal, Ofer)"
+                        style={{
+                            padding: "6px 10px",
+                            border: "1px solid #d1d5db",
+                            borderRadius: "4px",
+                            fontSize: "14px",
+                            minWidth: "200px"
+                        }}
+                    />
+                    <button
+                        onClick={() => setShowAddForm(!showAddForm)}
+                        style={{
+                            padding: "6px 12px",
+                            background: "#059669",
+                            color: "white",
+                            border: "none",
+                            borderRadius: 4,
+                            cursor: "pointer",
+                            fontSize: 12,
+                            fontWeight: "600"
+                        }}
+                    >
+                        ➕ Add Custom Preset
+                    </button>
+                </div>
+            </div>
+
             {/* Port Selection */}
             <div style={{ 
                 background: "#e0f2fe", 
@@ -225,23 +368,159 @@ function PresetsPanel({ onLoadPreset }) {
                 </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
-                {presets.map((preset, i) => (
-                    <div key={i} style={{ 
-                        background: "#f8fafc", 
-                        border: "1px solid #e2e8f0",
+            {/* Add/Edit Custom Preset Form */}
+            {showAddForm && (
+                <div style={{ 
+                    background: "#fef3c7", 
+                    padding: "16px", 
+                    borderRadius: "8px", 
+                    marginBottom: "16px",
+                    border: "1px solid #f59e0b"
+                }}>
+                    <h4 style={{ margin: "0 0 12px 0", color: "#92400e" }}>
+                        {editingPreset ? "✏️ Edit Custom Preset" : "➕ Add New Custom Preset"}
+                    </h4>
+                    
+                    <div style={{ display: "grid", gap: "12px", gridTemplateColumns: "1fr 2fr" }}>
+                        <div>
+                            <label style={{ fontSize: "12px", fontWeight: "600", color: "#374151", display: "block", marginBottom: "4px" }}>
+                                Preset Name *
+                            </label>
+                            <input
+                                type="text"
+                                value={newPresetName}
+                                onChange={(e) => setNewPresetName(e.target.value)}
+                                placeholder="e.g., My Custom Config"
+                                style={{
+                                    width: "100%",
+                                    padding: "6px 10px",
+                                    border: "1px solid #d1d5db",
+                                    borderRadius: "4px",
+                                    fontSize: "14px"
+                                }}
+                            />
+                        </div>
+                        
+                        <div>
+                            <label style={{ fontSize: "12px", fontWeight: "600", color: "#374151", display: "block", marginBottom: "4px" }}>
+                                Description
+                            </label>
+                            <input
+                                type="text"
+                                value={newPresetDesc}
+                                onChange={(e) => setNewPresetDesc(e.target.value)}
+                                placeholder="Brief description of what this preset does"
+                                style={{
+                                    width: "100%",
+                                    padding: "6px 10px",
+                                    border: "1px solid #d1d5db",
+                                    borderRadius: "4px",
+                                    fontSize: "14px"
+                                }}
+                            />
+                        </div>
+                    </div>
+                    
+                    <div style={{ marginTop: "12px" }}>
+                        <label style={{ fontSize: "12px", fontWeight: "600", color: "#374151", display: "block", marginBottom: "4px" }}>
+                            MII Commands * (one per line)
+                        </label>
+                        <textarea
+                            value={newPresetContent}
+                            onChange={(e) => setNewPresetContent(e.target.value)}
+                            placeholder={`# Example custom preset\nmii write 0x1c 0x19 0x1234\nmii write 0x1c 0x18 0x9ABC\nmii read 0x1c 0x19`}
+                            rows={8}
+                            style={{
+                                width: "100%",
+                                padding: "8px",
+                                border: "1px solid #d1d5db",
+                                borderRadius: "4px",
+                                fontSize: "12px",
+                                fontFamily: "monospace",
+                                resize: "vertical"
+                            }}
+                        />
+                    </div>
+                    
+                    <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
+                        <button
+                            onClick={editingPreset ? saveEditedPreset : addCustomPreset}
+                            style={{
+                                padding: "8px 16px",
+                                background: "#059669",
+                                color: "white",
+                                border: "none",
+                                borderRadius: 4,
+                                cursor: "pointer",
+                                fontSize: 14,
+                                fontWeight: "600"
+                            }}
+                        >
+                            {editingPreset ? "💾 Save Changes" : "➕ Add Preset"}
+                        </button>
+                        <button
+                            onClick={cancelEdit}
+                            style={{
+                                padding: "8px 16px",
+                                background: "#6b7280",
+                                color: "white",
+                                border: "none",
+                                borderRadius: 4,
+                                cursor: "pointer",
+                                fontSize: 14
+                            }}
+                        >
+                            ❌ Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Presets Grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 12 }}>
+                {allPresets.map((preset, i) => (
+                    <div key={preset.id || i} style={{ 
+                        background: preset.isCustom ? "#f0fdf4" : "#f8fafc", 
+                        border: `1px solid ${preset.isCustom ? "#22c55e" : "#e2e8f0"}`,
                         borderRadius: 8, 
-                        padding: 12 
+                        padding: 12,
+                        position: "relative"
                     }}>
-                        <h4 style={{ margin: "0 0 8px 0", color: "#1f2937" }}>{preset.name}</h4>
+                        {/* Preset Type Badge */}
+                        <div style={{
+                            position: "absolute",
+                            top: "8px",
+                            right: "8px",
+                            background: preset.isCustom ? "#22c55e" : "#6b7280",
+                            color: "white",
+                            padding: "2px 6px",
+                            borderRadius: "4px",
+                            fontSize: "10px",
+                            fontWeight: "600"
+                        }}>
+                            {preset.isCustom ? "CUSTOM" : "SYSTEM"}
+                        </div>
+                        
+                        <h4 style={{ margin: "0 0 8px 0", color: "#1f2937", paddingRight: "60px" }}>
+                            {preset.name}
+                        </h4>
+                        
+                        {/* Custom preset info */}
+                        {preset.isCustom && (
+                            <div style={{ fontSize: "10px", color: "#059669", marginBottom: "6px", fontWeight: "600" }}>
+                                👤 Created by: {preset.createdBy} | 📅 {preset.createdAt}
+                            </div>
+                        )}
+                        
                         <p style={{ margin: "0 0 8px 0", fontSize: 12, color: "#6b7280" }}>
                             {preset.portSpecific ? preset.desc.replace("selected", `port ${selectedPort}`) : preset.desc}
                         </p>
+                        
                         <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 8 }}>
-                            {preset.isSequence ? (
+                            {preset.isSequence || preset.isCustom ? (
                                 <div>
                                     <div style={{ color: "#dc2626", fontWeight: "600", marginBottom: 2 }}>
-                                        🔄 Multi-command sequence ({preset.sequence.length} commands)
+                                        🔄 Multi-command sequence ({preset.isCustom ? preset.sequence.length : preset.sequence.length} commands)
                                     </div>
                                     <div style={{ color: "#7c2d12" }}>
                                         Copies sequence to clipboard automatically
@@ -259,20 +538,57 @@ function PresetsPanel({ onLoadPreset }) {
                                 </>
                             )}
                         </div>
-                        <button
-                            onClick={() => handleLoadPreset(preset)}
-                            style={{
-                                padding: "6px 12px",
-                                background: preset.isSequence ? "#dc2626" : "#3b82f6",
-                                color: "white",
-                                border: "none",
-                                borderRadius: 4,
-                                cursor: "pointer",
-                                fontSize: 12
-                            }}
-                        >
-                            {preset.isSequence ? "Copy Sequence" : "Load Preset"}
-                        </button>
+                        
+                        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                            <button
+                                onClick={() => handleLoadPreset(preset)}
+                                style={{
+                                    padding: "6px 12px",
+                                    background: preset.isSequence || preset.isCustom ? "#dc2626" : "#3b82f6",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: 4,
+                                    cursor: "pointer",
+                                    fontSize: 12,
+                                    flex: 1
+                                }}
+                            >
+                                {preset.isSequence || preset.isCustom ? "Copy Sequence" : "Load Preset"}
+                            </button>
+                            
+                            {preset.isCustom && (
+                                <>
+                                    <button
+                                        onClick={() => editCustomPreset(preset)}
+                                        style={{
+                                            padding: "6px 8px",
+                                            background: "#f59e0b",
+                                            color: "white",
+                                            border: "none",
+                                            borderRadius: 4,
+                                            cursor: "pointer",
+                                            fontSize: 10
+                                        }}
+                                    >
+                                        ✏️
+                                    </button>
+                                    <button
+                                        onClick={() => deleteCustomPreset(preset.id)}
+                                        style={{
+                                            padding: "6px 8px",
+                                            background: "#ef4444",
+                                            color: "white",
+                                            border: "none",
+                                            borderRadius: 4,
+                                            cursor: "pointer",
+                                            fontSize: 10
+                                        }}
+                                    >
+                                        🗑️
+                                    </button>
+                                </>
+                            )}
+                        </div>
                     </div>
                 ))}
             </div>
