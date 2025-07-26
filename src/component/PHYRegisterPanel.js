@@ -10,15 +10,16 @@ const PHY_REGISTERS = {
                 bits: [
                     { bit: 15, name: "Copper Reset", type: "R/W, SC", desc: "1=PHY reset, 0=Normal operation" },
                     { bit: 14, name: "Loopback", type: "R/W", desc: "1=Enable loopback, 0=Disable loopback" },
-                    { bit: 13, name: "Speed Select LSB", type: "R/W, Update", desc: "Combined with bit 6 for speed" },
+                    { bit: 13, name: "Speed Select LSB", type: "R/W, Update", desc: "Speed bit 0 (combined with bit 6): 00=10Mbps, 01=100Mbps, 10=1000Mbps, 11=Reserved" },
                     { bit: 12, name: "Auto-Negotiation Enable", type: "R/W, Update", desc: "1=Enable auto-neg, 0=Disable" },
                     { bit: 11, name: "Power Down", type: "R/W, Retain", desc: "1=Power down, 0=Normal operation" },
                     { bit: 10, name: "Isolate", type: "RO", desc: "No effect" },
                     { bit: 9, name: "Restart Auto-Negotiation", type: "R/W, SC", desc: "1=Restart auto-neg, 0=Normal" },
                     { bit: 8, name: "Duplex Mode", type: "R/W, Update", desc: "1=Full-duplex, 0=Half-duplex" },
                     { bit: 7, name: "Collision Test", type: "RO", desc: "No effect" },
-                    { bit: 6, name: "Speed Selection MSB", type: "R/W, Update", desc: "Combined with bit 13" },
-                    { bits: "5:0", name: "Reserved", type: "RO", desc: "Always 000000" }
+                    { bit: 6, name: "Speed Selection MSB", type: "R/W, Update", desc: "Speed bit 1 (combined with bit 13): 00=10Mbps, 01=100Mbps, 10=1000Mbps, 11=Reserved" },
+                    { bits: "5:1", name: "Reserved", type: "RO", desc: "Always 00000" },
+                    { bit: 0, name: "Reserved", type: "RO", desc: "Always 0" }
                 ]
             },
             0x01: {
@@ -292,6 +293,252 @@ const PHY_REGISTERS = {
                     { bits: "3:2", name: "100 MB Test Select", type: "R/W, Retain", desc: "0x=Normal operation, 10=Select 112ns sequence, 11=Select 16ns sequence" },
                     { bit: 1, name: "10 BT Polarity Force", type: "R/W, Retain", desc: "1=Force negative polarity for receive only, 0=Normal" },
                     { bit: 0, name: "Reserved", type: "R/W, Retain", desc: "Reserved" }
+                ]
+            }
+        }
+    },
+    1: {
+        name: "Page 1 - SERDES/Fiber/SGMII Registers",
+        registers: {
+            0x00: {
+                name: "Fiber Control Register",
+                bits: [
+                    { bit: 15, name: "Fiber Reset", type: "R/W, SC", desc: "1=PHY reset, 0=Normal operation" },
+                    { bit: 14, name: "Loopback", type: "R/W", desc: "1=Enable Loopback, 0=Disable Loopback" },
+                    { bit: 13, name: "Speed Select LSB", type: "RO/R/W", desc: "Combined with bit 6 for speed selection" },
+                    { bit: 12, name: "Auto-Negotiation Enable", type: "R/W", desc: "1=Enable Auto-Negotiation, 0=Disable Auto-Negotiation" },
+                    { bit: 11, name: "Power Down", type: "R/W", desc: "1=Power down, 0=Normal operation" },
+                    { bit: 10, name: "Isolate", type: "RO", desc: "Always 0 (function not supported)" },
+                    { bit: 9, name: "Restart Fiber Auto-Negotiation", type: "R/W, SC", desc: "1=Restart Auto-Negotiation, 0=Normal operation" },
+                    { bit: 8, name: "Duplex Mode", type: "R/W", desc: "1=Full-duplex, 0=Half-duplex" },
+                    { bit: 7, name: "Collision Test", type: "RO", desc: "Always 0 (no effect)" },
+                    { bit: 6, name: "Speed Selection MSB", type: "RO/R/W", desc: "Combined with bit 13: 10=1000Mbps, 01=100Mbps, 00=10Mbps" },
+                    { bits: "5:0", name: "Reserved", type: "RO", desc: "Always 000000" }
+                ]
+            },
+            0x01: {
+                name: "Fiber Status Register",
+                bits: [
+                    { bit: 15, name: "100BASE-T4", type: "RO", desc: "Always 0 (protocol not available)" },
+                    { bit: 14, name: "100BASE-X Full-Duplex", type: "RO", desc: "1=Capable, 0=Not capable (depends on MODE setting)" },
+                    { bit: 13, name: "100BASE-X Half-Duplex", type: "RO", desc: "1=Capable, 0=Not capable (depends on MODE setting)" },
+                    { bit: 12, name: "10 Mbps Full Duplex", type: "RO", desc: "Always 0 (not supported)" },
+                    { bit: 11, name: "10 Mbps Half-Duplex", type: "RO", desc: "Always 0 (not supported)" },
+                    { bit: 10, name: "100BASE-T2 Full-Duplex", type: "RO", desc: "Always 0 (not available)" },
+                    { bit: 9, name: "100BASE-T2 Half-Duplex", type: "RO", desc: "Always 0 (not available)" },
+                    { bit: 8, name: "Extended Status", type: "RO", desc: "Always 1 (Extended status in Register 15)" },
+                    { bit: 7, name: "Reserved", type: "RO", desc: "Always 0" },
+                    { bit: 6, name: "MF Preamble Suppression", type: "RO", desc: "Always 1 (accepts management frames with preamble suppressed)" },
+                    { bit: 5, name: "Fiber Auto-Negotiation Complete", type: "RO", desc: "1=Auto-Negotiation complete, 0=Not complete" },
+                    { bit: 4, name: "Fiber Remote Fault", type: "RO, LH", desc: "1=Remote fault detected, 0=No remote fault (always 0 in SGMII modes)" },
+                    { bit: 3, name: "Auto-Negotiation Ability", type: "RO", desc: "1=Capable, 0=Not capable (depends on MODE setting)" },
+                    { bit: 2, name: "Fiber Link Status", type: "RO, LL", desc: "1=Link up, 0=Link down (latching low)" },
+                    { bit: 1, name: "Reserved", type: "RO, LH", desc: "Always 0" },
+                    { bit: 0, name: "Extended Capability", type: "RO", desc: "Always 1 (extended register capabilities)" }
+                ]
+            },
+            0x02: {
+                name: "PHY Identifier 1",
+                bits: [
+                    { bits: "15:0", name: "OUI Bits 3:18", type: "RO", desc: "Value: 0x0141 (Marvell OUI bits 3-18)" }
+                ]
+            },
+            0x03: {
+                name: "PHY Identifier 2",
+                bits: [
+                    { bits: "15:10", name: "OUI LSB", type: "RO", desc: "Always 000011 (OUI bits 19:24)" },
+                    { bits: "9:4", name: "Model Number", type: "RO", desc: "Device model number" },
+                    { bits: "3:0", name: "Revision Number", type: "RO", desc: "Device revision" }
+                ]
+            },
+            0x04: {
+                name: "Fiber Auto-Negotiation Advertisement Register (SGMII System Mode)",
+                bits: [
+                    { bit: 15, name: "Link Status (SGMII)", type: "RO", desc: "Copper Interface Link Status" },
+                    { bit: 14, name: "Reserved", type: "RO", desc: "Always 0" },
+                    { bit: 13, name: "Reserved", type: "RO", desc: "Always 0" },
+                    { bit: 12, name: "Duplex Status (SGMII)", type: "RO", desc: "Interface Duplex Resolution" },
+                    { bits: "11:10", name: "Speed[1:0] (SGMII)", type: "RO", desc: "Interface Speed Resolution: 00=10Mbps, 01=100Mbps, 10=1000Mbps, 11=Reserved" },
+                    { bit: 9, name: "Transmit Pause (SGMII)", type: "RO", desc: "Transmit Pause Status" },
+                    { bit: 8, name: "Receive Pause (SGMII)", type: "RO", desc: "Receive Pause Status" },
+                    { bit: 7, name: "Fiber/Copper (SGMII)", type: "RO", desc: "Media Type: 0=Copper media, 1=Fiber media" },
+                    { bits: "6:0", name: "Reserved (SGMII)", type: "RO", desc: "Always 0000001" }
+                ]
+            },
+            0x05: {
+                name: "Fiber Link Partner Ability Register",
+                bits: [
+                    { bit: 15, name: "Next Page", type: "RO", desc: "Link Partner Next Page Capability" },
+                    { bit: 14, name: "Acknowledge", type: "RO", desc: "Link Partner Acknowledgment" },
+                    { bits: "13:12", name: "Remote Fault", type: "RO", desc: "Link Partner Remote Fault Status" },
+                    { bits: "11:9", name: "Reserved", type: "RO", desc: "0x0" },
+                    { bits: "8:7", name: "Asymmetric Pause", type: "RO", desc: "Link Partner Pause Capability" },
+                    { bit: 6, name: "1000BASE-X Half-Duplex", type: "RO", desc: "Link Partner Half-Duplex Capability" },
+                    { bit: 5, name: "1000BASE-X Full-Duplex", type: "RO", desc: "Link Partner Full-Duplex Capability" },
+                    { bits: "4:0", name: "Reserved", type: "RO", desc: "0x00" }
+                ]
+            },
+            0x06: {
+                name: "Fiber Auto-Negotiation Expansion Register",
+                bits: [
+                    { bits: "15:4", name: "Reserved", type: "RO", desc: "0x000" },
+                    { bit: 3, name: "Link Partner Next Page Able", type: "RO", desc: "Link Partner Next Page Capability" },
+                    { bit: 2, name: "Local Next Page Able", type: "RO", desc: "Always 1 (local device capable)" },
+                    { bit: 1, name: "Page Received", type: "RO, LH", desc: "New Page Received Status" },
+                    { bit: 0, name: "Link Partner Auto-Negotiation Able", type: "RO", desc: "Link Partner Auto-Negotiation Capability" }
+                ]
+            },
+            0x07: {
+                name: "Fiber Next Page Transmit Register",
+                bits: [
+                    { bit: 15, name: "Next Page", type: "R/W", desc: "Next Page Transmission" },
+                    { bit: 14, name: "Reserved", type: "RO", desc: "Always 0" },
+                    { bit: 13, name: "Message Page Mode", type: "R/W", desc: "Message Page Mode" },
+                    { bit: 12, name: "Acknowledge2", type: "R/W", desc: "Acknowledge 2" },
+                    { bit: 11, name: "Toggle", type: "RO", desc: "Toggle Bit (automatic)" },
+                    { bits: "10:0", name: "Message/Unformatted Field", type: "R/W", desc: "Message Field" }
+                ]
+            },
+            0x08: {
+                name: "Fiber Link Partner Next Page Register",
+                bits: [
+                    { bit: 15, name: "Next Page", type: "RO", desc: "Link Partner Next Page" },
+                    { bit: 14, name: "Acknowledge", type: "RO", desc: "Link Partner Acknowledge" },
+                    { bit: 13, name: "Message Page", type: "RO", desc: "Link Partner Message Page" },
+                    { bit: 12, name: "Acknowledge2", type: "RO", desc: "Link Partner Acknowledge2" },
+                    { bit: 11, name: "Toggle", type: "RO", desc: "Link Partner Toggle" },
+                    { bits: "10:0", name: "Message/Unformatted Field", type: "RO", desc: "Link Partner Message Field" }
+                ]
+            },
+            0x0F: {
+                name: "Extended Status Register",
+                bits: [
+                    { bit: 15, name: "1000BASE-X Full-Duplex", type: "RO", desc: "1000BASE-X Full-Duplex Capability" },
+                    { bit: 14, name: "1000BASE-X Half-Duplex", type: "RO", desc: "1000BASE-X Half-Duplex Capability" },
+                    { bit: 13, name: "1000BASE-T Full-Duplex", type: "RO", desc: "Always 0 (not supported)" },
+                    { bit: 12, name: "1000BASE-T Half-Duplex", type: "RO", desc: "Always 0 (not supported)" },
+                    { bits: "11:0", name: "Reserved", type: "RO", desc: "0x000" }
+                ]
+            },
+            0x10: {
+                name: "Fiber Specific Control Register 1",
+                bits: [
+                    { bits: "15:14", name: "Fiber Transmit FIFO Depth", type: "R/W", desc: "FIFO Depth Setting: 00=±16 Bits, 01=±24 Bits, 10=±32 Bits, 11=±40 Bits" },
+                    { bit: 13, name: "Block Carrier Extension Bit", type: "R/W", desc: "Carrier Extension Control: 1=Enable, 0=Disable" },
+                    { bit: 12, name: "SERDES Loopback", type: "R/W", desc: "SERDES Loopback Control: 1=Enable loopback from SERDES input to output, 0=Normal Operation" },
+                    { bit: 11, name: "Assert CRS on Transmit", type: "R/W", desc: "CRS Assertion Control: 1=Assert on transmit, 0=Never assert" },
+                    { bit: 10, name: "Force Link Good", type: "R/W", desc: "Force Link Status: 1=Force link good, 0=Normal operation" },
+                    { bit: 9, name: "Reserved", type: "R/W", desc: "Reserved" },
+                    { bit: 8, name: "SERDES Loopback Type", type: "R/W", desc: "Loopback Type Selection: 0=Through PCS (async), 1=Raw 10-bit data (sync required)" },
+                    { bits: "7:6", name: "Enhanced SGMII", type: "R/W", desc: "SGMII Enhancement Control: 00=No Flow Control, 01=Flow Control Mode 1, 10=Flow Control Mode 2, 11=Reserved" },
+                    { bits: "5:4", name: "Reserved", type: "R/W", desc: "0x0" },
+                    { bit: 3, name: "MAC Interface Power Down", type: "R/W", desc: "MAC Interface Power Control: 1=Always power up, 0=Can power down" },
+                    { bit: 2, name: "Reserved", type: "R/W", desc: "Must set to 1" },
+                    { bits: "1:0", name: "MODE[1:0]", type: "RO", desc: "Operating Mode: 00=100BASE-FX, 01=1000BASE-X, 10=SGMII System, 11=SGMII Media" }
+                ]
+            },
+            0x11: {
+                name: "Fiber Specific Status Register",
+                bits: [
+                    { bits: "15:14", name: "Speed", type: "RO", desc: "Resolved Speed Status: 11=Reserved, 10=1000 Mbps, 01=100 Mbps, 00=10 Mbps" },
+                    { bit: 13, name: "Duplex", type: "RO", desc: "Resolved Duplex Status: 1=Full-duplex, 0=Half-duplex" },
+                    { bit: 12, name: "Page Received", type: "RO, LH", desc: "Page Received Status: 1=Page received, 0=Page not received" },
+                    { bit: 11, name: "Speed and Duplex Resolved", type: "RO", desc: "Resolution Status: 1=Resolved, 0=Not resolved" },
+                    { bit: 10, name: "Link (real time)", type: "RO", desc: "Real-time Link Status: 1=Link up, 0=Link down" },
+                    { bits: "9:6", name: "Reserved", type: "RO", desc: "Always 0000" },
+                    { bit: 5, name: "Sync Status", type: "RO", desc: "Synchronization Status: 1=Sync, 0=No Sync" },
+                    { bit: 4, name: "Fiber Energy Detect Status", type: "RO", desc: "Energy Detection: 1=No energy detected, 0=Energy detected" },
+                    { bit: 3, name: "Transmit Pause Enabled", type: "RO", desc: "Transmit Pause Status: 1=Enabled, 0=Disabled" },
+                    { bit: 2, name: "Receive Pause Enabled", type: "RO", desc: "Receive Pause Status: 1=Enabled, 0=Disabled" },
+                    { bits: "1:0", name: "Reserved", type: "RO", desc: "Always 00" }
+                ]
+            },
+            0x12: {
+                name: "Fiber Interrupt Enable Register",
+                bits: [
+                    { bit: 15, name: "Reserved", type: "RO", desc: "Always 0" },
+                    { bit: 14, name: "Speed Changed Interrupt Enable", type: "R/W", desc: "Speed Change Interrupt: 1=Enable, 0=Disable" },
+                    { bit: 13, name: "Duplex Changed Interrupt Enable", type: "R/W", desc: "Duplex Change Interrupt: 1=Enable, 0=Disable" },
+                    { bit: 12, name: "Page Received Interrupt Enable", type: "R/W", desc: "Page Received Interrupt: 1=Enable, 0=Disable" },
+                    { bit: 11, name: "Auto-Negotiation Completed Interrupt Enable", type: "R/W", desc: "Auto-Negotiation Complete Interrupt: 1=Enable, 0=Disable" },
+                    { bit: 10, name: "Link Status Changed Interrupt Enable", type: "R/W", desc: "Link Status Change Interrupt: 1=Enable, 0=Disable" },
+                    { bit: 9, name: "Symbol Error Interrupt Enable", type: "R/W", desc: "Symbol Error Interrupt: 1=Enable, 0=Disable" },
+                    { bit: 8, name: "False Carrier Interrupt Enable", type: "R/W", desc: "False Carrier Interrupt: 1=Enable, 0=Disable" },
+                    { bit: 7, name: "FIFO Over/Underflow Interrupt Enable", type: "R/W", desc: "FIFO Error Interrupt: 1=Enable, 0=Disable" },
+                    { bits: "6:5", name: "Reserved", type: "RO", desc: "Always 00" },
+                    { bit: 4, name: "Fiber Energy Detect Interrupt Enable", type: "R/W", desc: "Energy Detect Interrupt: 1=Enable, 0=Disable" },
+                    { bits: "3:0", name: "Reserved", type: "RO", desc: "Always 0000" }
+                ]
+            },
+            0x13: {
+                name: "Fiber Interrupt Status Register",
+                bits: [
+                    { bit: 15, name: "Reserved", type: "RO", desc: "Always 0" },
+                    { bit: 14, name: "Speed Changed", type: "RO, LH", desc: "Speed Change Status: 1=Speed changed, 0=No change" },
+                    { bit: 13, name: "Duplex Changed", type: "RO, LH", desc: "Duplex Change Status: 1=Duplex changed, 0=No change" },
+                    { bit: 12, name: "Page Received", type: "RO, LH", desc: "Page Received Status: 1=Page received, 0=No page received" },
+                    { bit: 11, name: "Auto-Negotiation Completed", type: "RO, LH", desc: "Auto-Negotiation Complete Status: 1=Completed, 0=Not completed" },
+                    { bit: 10, name: "Link Status Changed", type: "RO, LH", desc: "Link Status Change: 1=Link status changed, 0=No change" },
+                    { bit: 9, name: "Symbol Error", type: "RO, LH", desc: "Symbol Error Status: 1=Symbol error, 0=No error" },
+                    { bit: 8, name: "False Carrier", type: "RO, LH", desc: "False Carrier Status: 1=False carrier, 0=No false carrier" },
+                    { bit: 7, name: "FIFO Over/Underflow", type: "RO, LH", desc: "FIFO Error Status: 1=Over/Underflow error, 0=No error" },
+                    { bits: "6:5", name: "Reserved", type: "RO", desc: "Always 00" },
+                    { bit: 4, name: "Fiber Energy Detect Changed", type: "RO, LH", desc: "Energy Detect Change: 1=Energy detect state changed, 0=No change" },
+                    { bits: "3:0", name: "Reserved", type: "RO", desc: "Always 0000" }
+                ]
+            },
+            0x15: {
+                name: "Fiber Receive Error Counter Register",
+                bits: [
+                    { bits: "15:0", name: "Receive Error Count", type: "RO, LH", desc: "Receive Error Counter - pegs at 0xFFFF, reports false carrier and symbol errors" }
+                ]
+            },
+            0x16: {
+                name: "Fiber Page Register",
+                bits: [
+                    { bits: "15:0", name: "Page Select", type: "R/W", desc: "Page Number Selection - Default: 0x0001 (Page 1), used to select page for SERDES register access" }
+                ]
+            },
+            0x17: {
+                name: "PRBS Control",
+                bits: [
+                    { bits: "15:8", name: "Reserved", type: "R/W", desc: "0x00" },
+                    { bit: 7, name: "Invert Checker Polarity", type: "R/W", desc: "PRBS Checker Polarity: 0=Invert, 1=Normal" },
+                    { bit: 6, name: "Invert Generator Polarity", type: "R/W", desc: "PRBS Generator Polarity: 0=Invert, 1=Normal" },
+                    { bit: 5, name: "PRBS Lock", type: "R/W", desc: "PRBS Lock Control: 0=Counter free runs, 1=Wait for PRBS lock before counting" },
+                    { bit: 4, name: "Clear Counter", type: "R/W, SC", desc: "Clear PRBS Counter: 0=Normal, 1=Clear counter" },
+                    { bits: "3:2", name: "Reserved", type: "R/W", desc: "0x0" },
+                    { bit: 1, name: "PRBS Checker Enable", type: "R/W", desc: "PRBS Checker Control: 0=Disable, 1=Enable" },
+                    { bit: 0, name: "PRBS Generator Enable", type: "R/W", desc: "PRBS Generator Control: 0=Disable, 1=Enable" }
+                ]
+            },
+            0x18: {
+                name: "PRBS Error Counter LSB",
+                bits: [
+                    { bits: "15:0", name: "PRBS Error Count LSB", type: "RO", desc: "PRBS Error Counter Low Bytes - reading freezes Register 0x19, cleared when Register 0x17 bit 4 is set" }
+                ]
+            },
+            0x19: {
+                name: "PRBS Error Counter MSB",
+                bits: [
+                    { bits: "15:0", name: "PRBS Error Count MSB", type: "RO", desc: "PRBS Error Counter High Bytes - only updates after Register 0x18 is read first, cleared when Register 0x17 bit 4 is set" }
+                ]
+            },
+            0x1A: {
+                name: "Fiber Specific Control Register 2",
+                bits: [
+                    { bit: 15, name: "Reference Clock Source Select", type: "R/W", desc: "Clock Source Selection: 1=Use SE_SCLK as 25 MHz source, 0=Use XTAL1 as 25 MHz source (88E6321 only)" },
+                    { bit: 14, name: "1000BASE-X Noise Filtering", type: "R/W", desc: "1000BASE-X Noise Filter: 1=Enable, 0=Disable" },
+                    { bit: 13, name: "100BASE-FX Noise Filtering", type: "R/W", desc: "100BASE-FX Noise Filter: 1=Enable, 0=Disable" },
+                    { bits: "12:10", name: "Reserved", type: "R/W", desc: "0x0" },
+                    { bit: 9, name: "FEFI Enable", type: "R/W", desc: "100BASE-FX FEFI Enable: 1=Enable, 0=Disable" },
+                    { bit: 8, name: "Reserved", type: "R/W", desc: "0x0" },
+                    { bit: 7, name: "Reserved", type: "R/W", desc: "0x0" },
+                    { bit: 6, name: "Serial Interface Auto-Negotiation Bypass Enable", type: "R/W", desc: "Bypass Enable: 1=Bypass allowed, 0=No bypass allowed" },
+                    { bit: 5, name: "Serial Interface Auto-Negotiation Bypass Status", type: "RO", desc: "Bypass Status: 1=Link came up via bypass, 0=Link came up via regular Auto-Negotiation" },
+                    { bit: 4, name: "Reserved", type: "R/W", desc: "0x0" },
+                    { bit: 3, name: "Fiber Transmitter Disable", type: "R/W", desc: "Transmitter Control: 1=Transmitter disable, 0=Transmitter enable" },
+                    { bits: "2:0", name: "SGMII/Fiber Output Amplitude", type: "R/W", desc: "Output Voltage Control: 000=14mV, 001=112mV, 010=210mV, 011=308mV, 100=406mV, 101=504mV, 110=602mV, 111=700mV" }
                 ]
             }
         }
@@ -774,6 +1021,24 @@ function RegisterView({ pageNum, portNum, regAddr, regDef, currentValue, onValue
         onValueChange(newValue);
     };
     
+    // Helper function to decode speed for register 0x00
+    const getSpeedDecoding = () => {
+        if (pageNum === 0 && regAddr === 0x00) {
+            const bit6 = (currentValue >> 6) & 1; // MSB
+            const bit13 = (currentValue >> 13) & 1; // LSB
+            const speedBits = (bit6 << 1) | bit13; // Combine: bit6 is MSB, bit13 is LSB
+            
+            switch (speedBits) {
+                case 0b00: return "10 Mbps";      // 00 = 10 Mbps
+                case 0b01: return "100 Mbps";     // 01 = 100 Mbps  
+                case 0b10: return "1000 Mbps";    // 10 = 1000 Mbps
+                case 0b11: return "Reserved";     // 11 = Reserved
+                default: return "Unknown";
+            }
+        }
+        return null;
+    };
+    
     const handleBitRangeChange = (bitRange, newRangeValue) => {
         const [high, low] = bitRange.split(':').map(n => parseInt(n));
         const bitCount = high - low + 1;
@@ -842,27 +1107,54 @@ function RegisterView({ pageNum, portNum, regAddr, regDef, currentValue, onValue
                     Port {portNum} - Register 0x{regAddr.toString(16).toUpperCase()} ({regAddr}) - {regDef.name}
                 </h4>
                 
-                <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "12px" }}>
+                <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "12px", flexWrap: "wrap" }}>
                     <div>
                         <label style={{ fontSize: "12px", color: "#6b7280" }}>Current Value:</label>
                         <input
                             type="text"
                             value={`0x${currentValue.toString(16).padStart(4, '0').toUpperCase()}`}
                             onChange={handleManualValueChange}
+                            placeholder="Enter hex (e.g., 0x9100)"
                             style={{
                                 marginLeft: "8px",
-                                padding: "4px 8px",
+                                padding: "6px 10px",
                                 fontFamily: "monospace",
-                                fontSize: "12px",
+                                fontSize: "14px",
                                 border: "1px solid #d1d5db",
-                                borderRadius: "4px"
+                                borderRadius: "4px",
+                                width: "120px",
+                                minWidth: "120px"
                             }}
                         />
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#6b7280" }}>
+                        Decimal: {currentValue}
                     </div>
                     <div style={{ fontSize: "12px", color: "#6b7280" }}>
                         Binary: {currentValue.toString(2).padStart(16, '0')}
                     </div>
                 </div>
+
+                {/* Speed decoding for register 0x00 */}
+                {getSpeedDecoding() && (
+                    <div style={{ 
+                        marginBottom: "12px", 
+                        padding: "8px 12px", 
+                        background: "#f0f9ff", 
+                        border: "1px solid #0ea5e9", 
+                        borderRadius: "6px" 
+                    }}>
+                        <div style={{ fontSize: "14px", fontWeight: "600", color: "#0369a1" }}>
+                            🚀 Current Speed Setting: {getSpeedDecoding()}
+                        </div>
+                        <div style={{ fontSize: "11px", color: "#0369a1", marginTop: "2px" }}>
+                            Speed bits: Bit 6 (MSB) = {(currentValue >> 6) & 1}, Bit 13 (LSB) = {(currentValue >> 13) & 1} → Combined: {((currentValue >> 6) & 1) << 1 | ((currentValue >> 13) & 1)} ({(((currentValue >> 6) & 1) << 1 | ((currentValue >> 13) & 1)).toString(2).padStart(2, '0')})
+                        </div>
+                        <div style={{ fontSize: "10px", color: "#075985", marginTop: "4px" }}>
+                            To set speed: Toggle bits 6 and 13 to get desired combination (00=10M, 01=100M, 10=1000M, 11=Reserved)
+                        </div>
+                    </div>
+                )}
 
                 <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
                     <button

@@ -1,6 +1,6 @@
 import React from "react";
 
-function RawNumInput({ label, value, onChange, max = 4, disabled = false }) {
+function RawNumInput({ label, value, onChange, max = 8, disabled = false }) {
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <label style={{ fontSize: 12 }}>{label}</label>

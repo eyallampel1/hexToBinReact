@@ -86,9 +86,9 @@ export default function BasicControlPanel() {
         const speed13 = !!(val & 0x2000);
         const speed6 = !!(val & 0x0040);
         let speedStr = "10 Mbps";
-        if (speed13 && speed6) speedStr = "Reserved";
-        else if (speed13 && !speed6) speedStr = "1000 Mbps";
-        else if (!speed13 && speed6) speedStr = "100 Mbps";
+        if (speed13 && speed6) speedStr = "Reserved";      // 11 = Reserved
+        else if (!speed13 && speed6) speedStr = "1000 Mbps"; // 10 = 1000 Mbps (bit6=1, bit13=0)
+        else if (speed13 && !speed6) speedStr = "100 Mbps";  // 01 = 100 Mbps (bit6=0, bit13=1)
         
         return {
             softReset: !!(val & 0x8000),

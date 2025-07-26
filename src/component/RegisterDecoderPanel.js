@@ -55,7 +55,7 @@ export default function RegisterDecoderPanel() {
                 bits.push({ bit: 8, name: "Full Duplex", value: !!(val & 0x0100), desc: "Full-duplex mode" });
                 bits.push({ bit: 7, name: "Collision Test", value: !!(val & 0x0080), desc: "Collision test (no effect)" });
                 bits.push({ bit: 6, name: "Speed MSB", value: !!(val & 0x0040), desc: "Speed select MSB" });
-                const speed = ((val & 0x2000) >> 12) | ((val & 0x0040) >> 6);
+                const speed = (((val & 0x0040) >> 6) << 1) | ((val & 0x2000) >> 13);
                 const speedStr = ["10 Mbps", "100 Mbps", "1000 Mbps", "Reserved"][speed];
                 bits.push({ bit: "13,6", name: "Speed", value: speedStr, desc: "Combined speed selection", isMultiBit: true });
                 break;
@@ -301,7 +301,7 @@ export default function RegisterDecoderPanel() {
                     Binary: <span style={{ color: "#3b82f6" }}>{binaryView.match(/.{1,4}/g).join(" ")}</span>
                 </div>
                 <div style={{ display: "flex", gap: 20, fontSize: 13, color: "#6b7280" }}>
-                    <span>Hex: <strong style={{ color: "#059669" }}>0x{regValue.padStart(4, "0").toUpperCase()}</strong></span>
+                    <span>Hex: <strong style={{ color: "#059669" }}>0x{toWord(regValue).toString(16).padStart(4, "0").toUpperCase()}</strong></span>
                     <span>Dec: <strong style={{ color: "#dc2626" }}>{toWord(regValue)}</strong></span>
                     <span>Reg: <strong style={{ color: "#7c3aed" }}>{regType.replace(/_/g, " ")}</strong></span>
                 </div>
