@@ -10,21 +10,32 @@ import SwitchRegisterPanel from "./component/SwitchRegisterPanel";
 import SwitchGlobal1Panel from "./component/SwitchGlobal1Panel";
 import SwitchGlobal2Panel from "./component/SwitchGlobal2Panel";
 import HexToBinApp from "./component/HexToBinApp";
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
 
 /* ════════════════════════ helpers ════════════════════════ */
 function RawNumInput({ label, value, onChange, max = 4, disabled = false }) {
+    const { colors } = useTheme();
+
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <label style={{ fontSize: 12 }}>{label}</label>
+            <label style={{ fontSize: 12, color: colors.text.secondary }}>{label}</label>
             <input
                 type="text"
                 value={value}
                 disabled={disabled}
                 maxLength={max}
                 onChange={(e) => onChange(e.target.value)}
-                style={{ padding: 4, fontFamily: "monospace" }}
+                style={{
+                    padding: 4,
+                    fontFamily: "monospace",
+                    backgroundColor: colors.input.bg,
+                    color: colors.input.text,
+                    border: `1px solid ${colors.border.primary}`,
+                    borderRadius: 4,
+                    transition: "all 0.3s ease"
+                }}
             />
-            <span style={{ fontSize: 10, color: "#888" }}>
+            <span style={{ fontSize: 10, color: colors.text.tertiary }}>
                 {value.toLowerCase().startsWith("0x") || /[a-f]/i.test(value)
                     ? "hex"
                     : "dec"}
@@ -47,6 +58,8 @@ const toWord = (v) => {
 
 /* ════════════════════════ Register Presets Panel ════════════════════════ */
 function PresetsPanel({ onLoadPreset }) {
+    const { colors } = useTheme();
+
     // Add localStorage persistence for selected port
     const [selectedPort, setSelectedPort] = useState(() => loadFromStorageApp('presets_selectedPort', "1"));
     
@@ -286,15 +299,16 @@ function PresetsPanel({ onLoadPreset }) {
 
     return (
         <div style={{ marginTop: 32 }}>
-            <h3>⚡ Register Presets</h3>
-            
+            <h3 style={{ color: colors.text.primary }}>⚡ Register Presets</h3>
+
             {/* User Management */}
-            <div style={{ 
-                background: "#f0f9ff", 
-                padding: "12px", 
-                borderRadius: "8px", 
+            <div style={{
+                background: colors.info.bg,
+                padding: "12px",
+                borderRadius: "8px",
                 marginBottom: "16px",
-                border: "1px solid #0ea5e9"
+                border: `1px solid ${colors.info.border}`,
+                transition: "all 0.3s ease"
             }}>
                 <h4 style={{ margin: "0 0 8px 0", color: "#0c4a6e" }}>👤 User Settings</h4>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
@@ -598,6 +612,7 @@ function PresetsPanel({ onLoadPreset }) {
 
 /* ════════════════════════ Command History Panel ════════════════════════ */
 function HistoryPanel() {
+    const { colors } = useTheme();
     const [history, setHistory] = useState([]);
 
     useEffect(() => {
@@ -620,23 +635,29 @@ function HistoryPanel() {
     if (history.length === 0) return null;
 
     return (
-        <div style={{ marginTop: 32, borderTop: "1px solid #e5e7eb", paddingTop: 20 }}>
-            <h3 style={{ color: "#374151", fontSize: 16, marginBottom: 12 }}>📋 Recent Commands</h3>
+        <div style={{
+            marginTop: 32,
+            borderTop: `1px solid ${colors.border.secondary}`,
+            paddingTop: 20,
+            transition: "all 0.3s ease"
+        }}>
+            <h3 style={{ color: colors.text.secondary, fontSize: 16, marginBottom: 12 }}>📋 Recent Commands</h3>
             <div style={{ maxHeight: 200, overflowY: "auto" }}>
                 {history.map((item, i) => (
-                    <div key={i} style={{ 
-                        background: "#f9fafb", 
-                        padding: 8, 
+                    <div key={i} style={{
+                        background: colors.tertiary,
+                        padding: 8,
                         marginBottom: 6,
                         borderRadius: 4,
                         fontSize: 11,
                         display: "flex",
                         justifyContent: "space-between",
-                        alignItems: "flex-start"
+                        alignItems: "flex-start",
+                        transition: "all 0.3s ease"
                     }}>
                         <div style={{ flex: 1, marginRight: 8 }}>
-                            <div style={{ color: "#6b7280", marginBottom: 2 }}>{item.timestamp}</div>
-                            <pre style={{ margin: 0, fontSize: 10, color: "#374151", whiteSpace: "pre-wrap" }}>
+                            <div style={{ color: colors.text.tertiary, marginBottom: 2 }}>{item.timestamp}</div>
+                            <pre style={{ margin: 0, fontSize: 10, color: colors.text.secondary, whiteSpace: "pre-wrap" }}>
                                 {item.command}
                             </pre>
                         </div>
@@ -644,11 +665,13 @@ function HistoryPanel() {
                             onClick={() => copyToClipboard(item.command)}
                             style={{
                                 padding: "2px 6px",
-                                background: "#e5e7eb",
+                                background: colors.button.secondary.bg,
+                                color: colors.button.secondary.text,
                                 border: "none",
                                 borderRadius: 3,
                                 cursor: "pointer",
-                                fontSize: 9
+                                fontSize: 9,
+                                transition: "all 0.3s ease"
                             }}
                         >
                             Copy
@@ -686,6 +709,8 @@ const saveToStorageApp = (key, value) => {
 
 /* ════════════════════════ Main Component ════════════════════════ */
 function MiiCommandBuilder() {
+    const { colors } = useTheme();
+
     // Initialize tab from localStorage
     const [tab, setTab] = useState(() => loadFromStorageApp(APP_STORAGE_KEYS.miiTab, "cmd"));
     const [mode, setMode] = useState("read");
@@ -733,7 +758,16 @@ function MiiCommandBuilder() {
     };
 
     return (
-        <div style={{ maxWidth: 900, margin: "2rem auto", fontFamily: "Arial, sans-serif" }}>
+        <div style={{
+            maxWidth: 900,
+            margin: "2rem auto",
+            fontFamily: "Arial, sans-serif",
+            backgroundColor: colors.primary,
+            color: colors.text.primary,
+            minHeight: "100vh",
+            padding: "20px",
+            transition: "all 0.3s ease"
+        }}>
             {/* Enhanced navigation */}
             <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
                 {[
@@ -755,14 +789,14 @@ function MiiCommandBuilder() {
                         onClick={() => setTab(key)}
                         style={{
                             padding: "8px 12px",
-                            background: tab === key ? color : "#f3f4f6",
-                            color: tab === key ? "white" : "#374151",
-                            border: "none",
+                            background: tab === key ? color : colors.secondary,
+                            color: tab === key ? "white" : colors.text.secondary,
+                            border: `1px solid ${colors.border.primary}`,
                             borderRadius: 6,
                             cursor: "pointer",
                             fontSize: 13,
                             fontWeight: tab === key ? "600" : "400",
-                            transition: "all 0.2s"
+                            transition: "all 0.3s ease"
                         }}
                     >
                         {label}
@@ -773,11 +807,28 @@ function MiiCommandBuilder() {
             {/* Tab content */}
             {tab === "cmd" && (
                 <>
-                    <h2 style={{ textAlign: "center", color: "#1f2937" }}>MII Indirect Command Builder</h2>
+                    <h2 style={{ textAlign: "center", color: colors.text.primary }}>MII Indirect Command Builder</h2>
                     <div style={{ display: "flex", gap: 16, justifyContent: "center", marginTop: 12 }}>
                         {["read", "write"].map(m => (
-                            <label key={m} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", background: mode === m ? "#dbeafe" : "#f9fafb", borderRadius: 8, cursor: "pointer" }}>
-                                <input type="radio" name="mode" value={m} checked={mode === m} onChange={() => setMode(m)} />
+                            <label key={m} style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 6,
+                                padding: "8px 16px",
+                                background: mode === m ? colors.button.primary.bg : colors.tertiary,
+                                color: mode === m ? "white" : colors.text.secondary,
+                                borderRadius: 8,
+                                cursor: "pointer",
+                                transition: "all 0.3s ease"
+                            }}>
+                                <input
+                                    type="radio"
+                                    name="mode"
+                                    value={m}
+                                    checked={mode === m}
+                                    onChange={() => setMode(m)}
+                                    style={{ accentColor: colors.button.primary.bg }}
+                                />
                                 <span style={{ textTransform: "capitalize", fontWeight: mode === m ? "600" : "400" }}>{m}</span>
                             </label>
                         ))}
@@ -787,17 +838,27 @@ function MiiCommandBuilder() {
                         <NumInput label="Reg addr" value={reg} onChange={setReg} />
                         <NumInput label="Data" value={dat} onChange={setDat} disabled={mode === "read"} />
                     </div>
-                    <pre style={{ background: "#1e1e1e", color: "#00c853", padding: 12, marginTop: 20, whiteSpace: "pre-wrap", borderRadius: 6 }}>{script}</pre>
+                    <pre style={{
+                        background: colors.secondary,
+                        color: colors.success.text,
+                        padding: 12,
+                        marginTop: 20,
+                        whiteSpace: "pre-wrap",
+                        borderRadius: 6,
+                        border: `1px solid ${colors.border.primary}`,
+                        transition: "all 0.3s ease"
+                    }}>{script}</pre>
                     <div style={{ textAlign: "right" }}>
                         <button
                             onClick={() => copyWithHistory(script)}
                             style={{
                                 padding: "8px 16px",
-                                background: copied ? "#10b981" : "#3b82f6",
+                                background: copied ? colors.success.border : colors.button.primary.bg,
                                 color: "white",
                                 border: "none",
                                 borderRadius: 6,
-                                cursor: "pointer"
+                                cursor: "pointer",
+                                transition: "all 0.3s ease"
                             }}
                         >
                             {copied ? "Copied ✅" : "Copy"}
@@ -825,6 +886,8 @@ function MiiCommandBuilder() {
 
 // New main App component with toggle functionality
 function App() {
+    const { colors, isDark, toggleTheme } = useTheme();
+
     // Initialize currentMode from localStorage
     const [currentMode, setCurrentMode] = useState(() => loadFromStorageApp(APP_STORAGE_KEYS.currentMode, "hextobinary"));
 
@@ -834,15 +897,56 @@ function App() {
     }, [currentMode]);
 
     return (
-        <div>
+        <div style={{
+            backgroundColor: colors.primary,
+            minHeight: "100vh",
+            transition: "all 0.3s ease"
+        }}>
             {/* Mode Toggle Header */}
-            <div style={{ 
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", 
-                color: "white", 
+            <div style={{
+                background: isDark
+                    ? "linear-gradient(135deg, #374151 0%, #1f2937 100%)"
+                    : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                color: "white",
                 padding: "20px 0",
                 textAlign: "center",
-                marginBottom: "0"
+                marginBottom: "0",
+                transition: "all 0.3s ease",
+                position: "relative"
             }}>
+                {/* Dark mode toggle in header */}
+                <button
+                    onClick={toggleTheme}
+                    style={{
+                        position: "absolute",
+                        top: "20px",
+                        right: "20px",
+                        padding: "10px",
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        color: "white",
+                        border: "1px solid rgba(255, 255, 255, 0.2)",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        fontSize: "20px",
+                        transition: "all 0.3s ease",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        minWidth: "48px",
+                        height: "48px",
+                        backdropFilter: "blur(10px)"
+                    }}
+                    onMouseOver={(e) => {
+                        e.target.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+                    }}
+                    onMouseOut={(e) => {
+                        e.target.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+                    }}
+                    title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+                >
+                    {isDark ? '☀️' : '🌙'}
+                </button>
+
                 <h1 style={{ margin: "0 0 20px 0", fontSize: "28px" }}>
                     <span style={{ color: "#ff4444" }}>Lampel</span> Network Tools Suite
                 </h1>
@@ -898,16 +1002,17 @@ function App() {
                 position: "fixed",
                 bottom: "20px",
                 right: "20px",
-                background: "rgba(0, 0, 0, 0.8)",
+                background: isDark ? "rgba(0, 0, 0, 0.9)" : "rgba(0, 0, 0, 0.8)",
                 color: "white",
                 padding: "8px 16px",
                 borderRadius: "8px",
                 fontSize: "12px",
                 fontWeight: "500",
                 backdropFilter: "blur(10px)",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
+                border: `1px solid ${isDark ? "rgba(255, 255, 255, 0.2)" : "rgba(255, 255, 255, 0.1)"}`,
                 zIndex: 1000,
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)"
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+                transition: "all 0.3s ease"
             }}>
                 Created By <span style={{ color: "#ff4444", fontWeight: "600" }}>Eyal Lampel</span>
             </div>
@@ -915,5 +1020,14 @@ function App() {
     );
 }
 
-// Export as default
-export default App;
+// Wrap App with ThemeProvider
+const AppWithTheme = () => {
+  return (
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
+  );
+};
+
+// Export the wrapped component as default
+export default AppWithTheme;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import HexDisplay from "./HexDisplay";
 import { ConvertBinToHex } from "../helpers";
+import { useTheme } from "../context/ThemeContext";
 import "./HexToBin.css";
 
 // localStorage helper functions for HexToBinApp
@@ -29,6 +30,8 @@ const saveToStorageHex = (key, value) => {
 };
 
 const HexToBinApp = () => {
+  const { colors } = useTheme();
+
   // Initialize state from localStorage
   const [userInput, setUserInput] = useState(() => loadFromStorageHex(HEX_STORAGE_KEYS.userInput, ""));
   const [bitsArray, setBitsArray] = useState(Array(64).fill(0));
@@ -95,23 +98,33 @@ const HexToBinApp = () => {
   };
 
   return (
-    <div style={{ maxWidth: 900, margin: "2rem auto", fontFamily: "Arial, sans-serif", padding: "20px" }}>
-      <h1 style={{ textAlign: "center", color: "#1f2937", marginBottom: "2rem" }}>
+    <div style={{
+      maxWidth: 900,
+      margin: "2rem auto",
+      fontFamily: "Arial, sans-serif",
+      padding: "20px",
+      backgroundColor: colors.primary,
+      color: colors.text.primary,
+      minHeight: "100vh",
+      transition: "all 0.3s ease"
+    }}>
+      <h1 style={{ textAlign: "center", color: colors.text.primary, marginBottom: "2rem" }}>
         🔢 Hex ↔ Binary Converter
       </h1>
 
       {/* Input Section */}
-      <div style={{ 
-        background: "#f8fafc", 
-        padding: "20px", 
-        borderRadius: "8px", 
+      <div style={{
+        background: colors.secondary,
+        padding: "20px",
+        borderRadius: "8px",
         marginBottom: "20px",
-        border: "1px solid #e2e8f0"
+        border: `1px solid ${colors.border.secondary}`,
+        transition: "all 0.3s ease"
       }}>
-        <h3 style={{ margin: "0 0 15px 0", color: "#374151" }}>Input (Hexadecimal)</h3>
+        <h3 style={{ margin: "0 0 15px 0", color: colors.text.secondary }}>Input (Hexadecimal)</h3>
         <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-            <span style={{ fontSize: "18px", fontWeight: "bold" }}>0x</span>
+            <span style={{ fontSize: "18px", fontWeight: "bold", color: colors.text.primary }}>0x</span>
             <input
               type="text"
               value={userInput}
@@ -121,10 +134,13 @@ const HexToBinApp = () => {
                 padding: "10px",
                 fontSize: "16px",
                 fontFamily: "monospace",
-                border: "2px solid #d1d5db",
+                border: `2px solid ${colors.input.border}`,
                 borderRadius: "6px",
                 width: "300px",
-                textTransform: "uppercase"
+                textTransform: "uppercase",
+                backgroundColor: colors.input.bg,
+                color: colors.input.text,
+                transition: "all 0.3s ease"
               }}
               maxLength={16}
             />
@@ -133,12 +149,13 @@ const HexToBinApp = () => {
             onClick={handleClear}
             style={{
               padding: "10px 15px",
-              background: "#ef4444",
-              color: "white",
+              background: colors.button.danger.bg,
+              color: colors.button.danger.text,
               border: "none",
               borderRadius: "6px",
               cursor: "pointer",
-              fontSize: "14px"
+              fontSize: "14px",
+              transition: "all 0.3s ease"
             }}
           >
             Clear
@@ -147,24 +164,32 @@ const HexToBinApp = () => {
       </div>
 
       {/* Controls */}
-      <div style={{ 
-        background: "#f1f5f9", 
-        padding: "15px", 
-        borderRadius: "8px", 
+      <div style={{
+        background: colors.tertiary,
+        padding: "15px",
+        borderRadius: "8px",
         marginBottom: "20px",
         display: "flex",
         gap: "20px",
         alignItems: "center",
-        flexWrap: "wrap"
+        flexWrap: "wrap",
+        transition: "all 0.3s ease"
       }}>
         <div>
-          <label style={{ fontSize: "14px", fontWeight: "600", marginRight: "10px" }}>
+          <label style={{ fontSize: "14px", fontWeight: "600", marginRight: "10px", color: colors.text.secondary }}>
             Bit Size:
           </label>
           <select
             value={bitSize}
             onChange={(e) => setBitSize(parseInt(e.target.value))}
-            style={{ padding: "5px", borderRadius: "4px", border: "1px solid #d1d5db" }}
+            style={{
+              padding: "5px",
+              borderRadius: "4px",
+              border: `1px solid ${colors.border.primary}`,
+              backgroundColor: colors.input.bg,
+              color: colors.input.text,
+              transition: "all 0.3s ease"
+            }}
           >
             <option value={8}>8-bit</option>
             <option value={16}>16-bit</option>
@@ -173,12 +198,12 @@ const HexToBinApp = () => {
           </select>
         </div>
         <div>
-          <label style={{ fontSize: "14px", fontWeight: "600", marginRight: "10px" }}>
+          <label style={{ fontSize: "14px", fontWeight: "600", marginRight: "10px", color: colors.text.secondary }}>
             <input
               type="checkbox"
               checked={displayMode}
               onChange={(e) => setDisplayMode(e.target.checked)}
-              style={{ marginRight: "5px" }}
+              style={{ marginRight: "5px", accentColor: colors.button.primary.bg }}
             />
             Reverse Bit Order
           </label>
@@ -186,15 +211,16 @@ const HexToBinApp = () => {
       </div>
 
       {/* Interactive Binary Display */}
-      <div style={{ 
-        background: "#ffffff", 
-        padding: "20px", 
-        borderRadius: "8px", 
-        border: "2px solid #3b82f6",
-        marginBottom: "20px"
+      <div style={{
+        background: colors.primary,
+        padding: "20px",
+        borderRadius: "8px",
+        border: `2px solid ${colors.border.accent}`,
+        marginBottom: "20px",
+        transition: "all 0.3s ease"
       }}>
-        <h3 style={{ margin: "0 0 15px 0", color: "#1f2937" }}>Interactive Binary Display</h3>
-        <p style={{ fontSize: "12px", color: "#6b7280", marginBottom: "15px" }}>
+        <h3 style={{ margin: "0 0 15px 0", color: colors.text.primary }}>Interactive Binary Display</h3>
+        <p style={{ fontSize: "12px", color: colors.text.tertiary, marginBottom: "15px" }}>
           Click on individual bits to toggle them, or modify hex values directly
         </p>
         <div style={{ 
@@ -215,41 +241,43 @@ const HexToBinApp = () => {
       </div>
 
       {/* Output Section */}
-      <div style={{ 
-        display: "grid", 
-        gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", 
-        gap: "15px" 
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+        gap: "15px"
       }}>
-        <div style={{ 
-          background: "#ecfdf5", 
-          padding: "15px", 
-          borderRadius: "8px", 
-          border: "1px solid #10b981" 
+        <div style={{
+          background: colors.success.bg,
+          padding: "15px",
+          borderRadius: "8px",
+          border: `1px solid ${colors.success.border}`,
+          transition: "all 0.3s ease"
         }}>
-          <h4 style={{ margin: "0 0 10px 0", color: "#065f46" }}>Hexadecimal</h4>
-          <div style={{ 
-            fontFamily: "monospace", 
-            fontSize: "16px", 
+          <h4 style={{ margin: "0 0 10px 0", color: colors.success.text }}>Hexadecimal</h4>
+          <div style={{
+            fontFamily: "monospace",
+            fontSize: "16px",
             fontWeight: "bold",
-            color: "#047857",
+            color: colors.success.text,
             wordBreak: "break-all"
           }}>
             0x{getHexOutput()}
           </div>
         </div>
 
-        <div style={{ 
-          background: "#fef3c7", 
-          padding: "15px", 
-          borderRadius: "8px", 
-          border: "1px solid #f59e0b" 
+        <div style={{
+          background: colors.warning.bg,
+          padding: "15px",
+          borderRadius: "8px",
+          border: `1px solid ${colors.warning.border}`,
+          transition: "all 0.3s ease"
         }}>
-          <h4 style={{ margin: "0 0 10px 0", color: "#92400e" }}>Binary</h4>
-          <div style={{ 
-            fontFamily: "monospace", 
-            fontSize: "14px", 
+          <h4 style={{ margin: "0 0 10px 0", color: colors.warning.text }}>Binary</h4>
+          <div style={{
+            fontFamily: "monospace",
+            fontSize: "14px",
             fontWeight: "bold",
-            color: "#b45309",
+            color: colors.warning.text,
             wordBreak: "break-all",
             lineHeight: "1.4"
           }}>
@@ -257,18 +285,19 @@ const HexToBinApp = () => {
           </div>
         </div>
 
-        <div style={{ 
-          background: "#e0f2fe", 
-          padding: "15px", 
-          borderRadius: "8px", 
-          border: "1px solid #0ea5e9" 
+        <div style={{
+          background: colors.info.bg,
+          padding: "15px",
+          borderRadius: "8px",
+          border: `1px solid ${colors.info.border}`,
+          transition: "all 0.3s ease"
         }}>
-          <h4 style={{ margin: "0 0 10px 0", color: "#0c4a6e" }}>Decimal</h4>
-          <div style={{ 
-            fontFamily: "monospace", 
-            fontSize: "16px", 
+          <h4 style={{ margin: "0 0 10px 0", color: colors.info.text }}>Decimal</h4>
+          <div style={{
+            fontFamily: "monospace",
+            fontSize: "16px",
             fontWeight: "bold",
-            color: "#0369a1",
+            color: colors.info.text,
             wordBreak: "break-all"
           }}>
             {getDecimalOutput()}
@@ -277,15 +306,16 @@ const HexToBinApp = () => {
       </div>
 
       {/* Instructions */}
-      <div style={{ 
-        background: "#f8fafc", 
-        padding: "15px", 
-        borderRadius: "8px", 
+      <div style={{
+        background: colors.secondary,
+        padding: "15px",
+        borderRadius: "8px",
         marginTop: "20px",
         fontSize: "14px",
-        color: "#64748b"
+        color: colors.text.muted,
+        transition: "all 0.3s ease"
       }}>
-        <h4 style={{ margin: "0 0 10px 0", color: "#374151" }}>How to use:</h4>
+        <h4 style={{ margin: "0 0 10px 0", color: colors.text.secondary }}>How to use:</h4>
         <ul style={{ margin: 0, paddingLeft: "20px" }}>
           <li>Enter a hexadecimal value in the input field (without 0x prefix)</li>
           <li>Click on individual bits to toggle them on/off</li>

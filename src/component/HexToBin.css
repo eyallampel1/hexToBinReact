@@ -8,12 +8,14 @@
   background-color: #454857; /* Sets the background color */
   border-radius: 15px; /* Rounds the corners of the element */
   border: 1px black solid; /* Sets a black border around the element */
+  transition: all 0.3s ease; /* Smooth transition for all properties */
 }
 
 /* Styling for label elements within elements with the class "byte_container" */
 .byte_container > label {
   color: #eef1ef; /* Sets the text color */
   justify-self: center; /* Centers the element within its grid area */
+  transition: color 0.3s ease; /* Smooth transition for color changes */
 }
 
 /* Styling for button elements within elements with the class "byte_container" */
@@ -25,11 +27,14 @@
   justify-self: center; /* Centers the button horizontally within its grid area */
   background-image: linear-gradient(180deg, #95d891, #74bbad); /* Sets the background to a linear gradient */
   border: 1px #eef1ef solid; /* Sets a solid border around the button */
+  transition: all 0.3s ease; /* Smooth transition for all properties */
+  border-radius: 4px; /* Slight border radius for better appearance */
 }
 
 /* Styling for active button elements within elements with the class "byte_container" */
 .byte_container > button:active {
   background-image: linear-gradient(180deg, #568054, #74bbad); /* Changes the background to a different linear gradient */
+  transform: scale(0.95); /* Slight scale down on active for visual feedback */
 }
 
 /* Styling for elements with the class "HexInput" */
@@ -47,9 +52,12 @@
   grid-row: 1; /* Places the input in the first grid row */
   justify-self: center; /* Centers the input horizontally within its grid area */
   align-self: center; /* Centers the input vertically within its grid area */
+  transition: all 0.3s ease; /* Smooth transition for all properties */
 }
 
 /* Styling for focused elements with the class "HexInput" */
 .HexInput:focus {
   outline: none; /* Removes the default outline */
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); /* Adds a subtle blue glow on focus */
+  transform: scale(1.05); /* Slight scale up on focus for visual feedback */
 }
